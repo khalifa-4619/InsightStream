@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Secrets and Config
+.env
+.flaskenv
+
+# Database
+*.sqlite3
+
+# Distributions / Packaging
+dist/
+build/
+*.egg-info/
+
+# Pytest
+.pytest_cache/
+
+# User-specific
+.vscode/
+.idea/
