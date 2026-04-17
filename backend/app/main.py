@@ -1,13 +1,18 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException,UploadFile, File
 from sqlalchemy.orm import Session
 from app.db.session import get_db
+from app.models.dataset import Dataset
+from app.models.user import User
 from app.schemas.user_schema import UserCreate, UserOut
-from app.crud import crud_user as user_crud
+from app.crud import crud_user as user_crud, crud_dataset
 from app.core.config import settings
 from app.core.security import verify_password, create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.token_schema import Token
+from app.schemas.data_schema import DataFileOut, DataFileCreate
 from datetime import timedelta
+import shutil
+import os
 
 app = FastAPI(title=settings.PROJECT_NAME, version="0.1.0")
 
@@ -58,3 +63,29 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+# Create a folder to store uploads if it doesn't exist
+UPLOAD_DIR = "uploads"
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
+    
+@app.post("/datasets/upload", response_model=DataFileOut)
+async def upload_dataset(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_crud.get_current_user) # The Security Guard
+):
+    # Validation (ensure it's a CSV)
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Only CSV files are allowed.")
+    # Save the physical file to disk
+    file_path = os.path.join(UPLOAD_DIR, f"{current_user.id}_{file.filename}")
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    # Save the metadata to the Database via ORM
+    dataset_in = DataFileCreate(
+        filename=file.filename,
+        file_typ="csv"
+    )
+    return crud_dataset.create_dataset(db, dataset_in, owner_id=current_user.id)

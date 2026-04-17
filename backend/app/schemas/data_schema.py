@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 
 class DataFileBase(BaseModel):
     filename: str
-    file_typ: str # e.g., 'csv', 'xlsx'
+    file_typ: Optional[str] # e.g., 'csv', 'xlsx'
     
 class DataFileCreate(DataFileBase):
     pass
@@ -13,7 +13,9 @@ class DataFileCreate(DataFileBase):
 class DataFileOut(DataFileBase):
     id: int
     owner_id: int
+    file_typ: str
     created_at: datetime
+    status: str
     summary_stats: Optional[Dict[str, Any]] = None
     
     class Config:
