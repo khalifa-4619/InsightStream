@@ -1,4 +1,5 @@
 import os
+import urllib
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
@@ -25,7 +26,9 @@ class Settings(BaseSettings):
     
     @property
     def DATABASE_URL(self) -> str:
-        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        # this quotes the password so special characters don't break the URL
+        password = urllib.parse.quote_plus(self.POSTGRES_PASSWORD)
+        return f"postgresql://{self.POSTGRES_USER}:{password}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     # Use the absolute path to the env file
     model_config = SettingsConfigDict(env_file=ENV_PATH)
