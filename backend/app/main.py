@@ -10,6 +10,7 @@ from app.core.security import verify_password, create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.token_schema import Token
 from app.schemas.data_schema import DataFileOut, DataFileCreate
+from app.services.analytics import analyze_csv
 from datetime import timedelta
 import shutil
 import os
@@ -78,14 +79,23 @@ async def upload_dataset(
     # Validation (ensure it's a CSV)
     if not file.filename.endswith('.csv'):
         raise HTTPException(status_code=400, detail="Only CSV files are allowed.")
+    
     # Save the physical file to disk
     file_path = os.path.join(UPLOAD_DIR, f"{current_user.id}_{file.filename}")
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
+    # Analyze the file immediately after saving
+    analysis_results = analyze_csv(file_path)
+        
     # Save the metadata to the Database via ORM
     dataset_in = DataFileCreate(
         filename=file.filename,
-        file_typ="csv"
+        file_typ="csv",
+        summary_stats=analysis_results
     )
-    return crud_dataset.create_dataset(db, dataset_in, owner_id=current_user.id)
+    return crud_dataset.create_dataset(
+        db,
+        dataset_in,
+        owner_id=current_user.id
+        )
