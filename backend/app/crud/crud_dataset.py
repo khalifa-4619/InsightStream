@@ -16,4 +16,7 @@ def create_dataset(db: Session, dataset: DataFileCreate, owner_id: int):
     return db_dataset
 
 def get_user_datasets(db: Session, owner_id: int):
-    return db.query(Dataset).filter(Dataset.owner_id == owner_id).all()
+    """
+    Fetches all datasets belonging to a specific user, sorted by the newest first.
+    """
+    return db.query(Dataset).filter(Dataset.owner_id == owner_id).order_by(Dataset.created_at.desc()).all( )

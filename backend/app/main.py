@@ -12,6 +12,7 @@ from app.schemas.token_schema import Token
 from app.schemas.data_schema import DataFileOut, DataFileCreate
 from app.services.analytics import analyze_csv
 from datetime import timedelta
+from typing import List
 import shutil
 import os
 
@@ -99,3 +100,16 @@ async def upload_dataset(
         dataset_in,
         owner_id=current_user.id
         )
+    
+
+@app.get("/datasets/", response_model=List[DataFileOut])
+def list_datasets(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_crud.get_current_user)
+):
+    """
+    Retrieve all datasets for the authenticated user.
+    """
+    datasets = crud_dataset.get_user_datasets(db, owner_id=current_user.id)
+    return datasets
+    
