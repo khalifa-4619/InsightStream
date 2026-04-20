@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException,UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.dataset import Dataset
@@ -17,6 +18,21 @@ import shutil
 import os
 
 app = FastAPI(title=settings.PROJECT_NAME, version="0.1.0")
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @app.get("/")
 def read_root():

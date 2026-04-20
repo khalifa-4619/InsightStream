@@ -1,9 +1,36 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight } from 'lucide-react'; // Icons for a pro look
+import axios from 'axios'
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    //Use URLSearchParams to format the data correctly for OAuth2
+    const formData = new URLSearchParams();
+    formData.append('username', email); //Must be 'username' for OAuth2
+    formData.append('password', password);
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/login', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      // If successful, we get a JWT Token back
+      const token = response.data.access_token
+      localStorage.setItem('token', token); //saved it to remain logged in
+      
+      alert("Success! Token acquired.");
+
+    } catch (error) {
+      console.error("Login failed", error);
+      alert("Check your backend, is it running?");
+    }
+  };
 
   return (
     // 'min-h-screen' makes it fill the whole window
@@ -19,7 +46,7 @@ const Login = () => {
             <p className="text-slate-500 mt-2">Transforming raw logs into actionable intelligence.</p>
           </div>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleLogin}>
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
