@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight } from 'lucide-react'; // Icons for a pro look
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,8 +26,8 @@ const Login = () => {
       // If successful, we get a JWT Token back
       const token = response.data.access_token
       localStorage.setItem('token', token); //saved it to remain logged in
+      navigate('/dashboard');
       
-      alert("Success! Token acquired.");
 
     } catch (error) {
       console.error("Login failed", error);
