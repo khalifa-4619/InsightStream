@@ -4,8 +4,12 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(), // This connects the engine directly to Vite
-  ],
+  plugins: [react()],
+  server: {
+    host: true, // Listen on all local IPs
+    port: 5173,
+    watch: {
+      usePolling: true, // Required for HMR to work between Windows and WSL
+    },
+  },
 })

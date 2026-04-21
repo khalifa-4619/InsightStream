@@ -11,11 +11,13 @@ from app.core.security import verify_password, create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.token_schema import Token
 from app.schemas.data_schema import DataFileOut, DataFileCreate
-from app.services.analytics import analyze_csv
+from app.services.analytics import analyze_file
 from datetime import timedelta
 from typing import List
 import shutil
 import os
+import pandas as pd
+import io
 
 app = FastAPI(title=settings.PROJECT_NAME, version="0.1.0")
 
@@ -91,31 +93,41 @@ if not os.path.exists(UPLOAD_DIR):
 async def upload_dataset(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(user_crud.get_current_user) # The Security Guard
+    current_user: User = Depends(user_crud.get_current_user)
 ):
-    # Validation (ensure it's a CSV)
-    if not file.filename.endswith('.csv'):
-        raise HTTPException(status_code=400, detail="Only CSV files are allowed.")
+    # Expanded Validation
+    allowed_extensions = {'.csv', '.xlsx', '.xls', '.json', '.log', '.txt'}
+    file_ext = os.path.splitext(file.filename)[1].lower()
     
-    # Save the physical file to disk
+    if file_ext not in allowed_extensions:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Extension {file_ext} not supported. Use CSV, Excel, JSON, or Logs."
+        )
+    
+    # Save the physical file
     file_path = os.path.join(UPLOAD_DIR, f"{current_user.id}_{file.filename}")
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
-    # Analyze the file immediately after saving
-    analysis_results = analyze_csv(file_path)
+    # Use the new generalized analyzer
+    analysis_results = analyze_file(file_path)
+    
+    if "error" in analysis_results:
+        raise HTTPException(status_code=422, detail=analysis_results["error"])
         
     # Save the metadata to the Database via ORM
     dataset_in = DataFileCreate(
         filename=file.filename,
-        file_typ="csv",
+        file_typ=file_ext.replace('.', ''), # 'csv', 'xlsx', etc.
         summary_stats=analysis_results
     )
+    
     return crud_dataset.create_dataset(
         db,
         dataset_in,
         owner_id=current_user.id
-        )
+    )
     
 
 @app.get("/datasets/", response_model=List[DataFileOut])
