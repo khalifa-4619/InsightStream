@@ -5,6 +5,7 @@ from app.schemas.data_schema import DataFileCreate
 def create_dataset(db: Session, dataset: DataFileCreate, owner_id: int):
     db_dataset = Dataset(
         filename=dataset.filename,
+        filepath=dataset.filepath,
         file_typ=dataset.file_typ,
         owner_id=owner_id,
         status="completed" if dataset.summary_stats else "uploaded",

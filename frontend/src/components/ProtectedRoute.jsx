@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
   
   if (!token) {
     // If no token, redirect to login
-    return <Navigate to="/" replace />;
+    return <Navigate to="/Login" replace />;
   }
 
   // If token exists, show the Dashboard

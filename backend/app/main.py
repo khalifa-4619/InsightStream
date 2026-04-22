@@ -14,6 +14,7 @@ from app.schemas.data_schema import DataFileOut, DataFileCreate
 from app.services.analytics import analyze_file
 from datetime import timedelta
 from typing import List
+from app.api.endpoints import analytics
 import shutil
 import os
 import pandas as pd
@@ -119,6 +120,7 @@ async def upload_dataset(
     # Save the metadata to the Database via ORM
     dataset_in = DataFileCreate(
         filename=file.filename,
+        filepath=file_path,
         file_typ=file_ext.replace('.', ''), # 'csv', 'xlsx', etc.
         summary_stats=analysis_results
     )
@@ -141,3 +143,5 @@ def list_datasets(
     datasets = crud_dataset.get_user_datasets(db, owner_id=current_user.id)
     return datasets
     
+# Mounting the analytics router
+app.include_router(analytics.router, prefix="/api")

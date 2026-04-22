@@ -8,6 +8,7 @@ class Dataset(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String, nullable=False)
+    filepath = Column(String, nullable=False)
     status = Column(String, default="uploaded") # uploaded, processing, completed
     summary_stats = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

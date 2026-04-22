@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import DataIngestion from '../components/DataIngestion';
+import Sidebar from '../components/Sidebar';
 
 const Dashboard = () => {
   const [datasets, setDatasets] = useState([]);
@@ -26,44 +27,10 @@ const Dashboard = () => {
 
   useEffect(() => { fetchDatasets(); }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
 
   return (
-    <div className="flex min-h-screen bg-slate-900 text-slate-100 relative">
-      
-      {/* SIDEBAR - RESTORED & FULLY INTACT */}
-      <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col sticky top-0 h-screen">
-        <div className="p-6">
-          <h2 className="text-xl font-black text-indigo-400 tracking-tighter uppercase italic">InsightStream</h2>
-        </div>
-        
-        <nav className="flex-1 px-4 space-y-2 text-sm">
-          <Link to="/dashboard" className="flex items-center gap-3 p-3 bg-indigo-900/30 text-indigo-400 rounded-lg font-semibold border border-indigo-500/20">
-            <Activity size={18} /> Live Streams
-          </Link>
-          <a href="#" className="flex items-center gap-3 p-3 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition-all">
-            <Database size={18} /> Data Sources
-          </a>
-          
-          {/* Restored items */}
-          <a href="#" className="flex items-center gap-3 p-3 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition-all">
-            <BarChart3 size={18} /> Analytics Models
-          </a>
-          <a href="#" className="flex items-center gap-3 p-3 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition-all">
-            <Terminal size={18} /> Logs Terminal
-          </a>
-        </nav>
-
-        <div className="p-4 border-t border-slate-800">
-          <button onClick={handleLogout} className="flex items-center gap-3 p-3 text-slate-500 hover:text-red-400 w-full transition-colors">
-            <LogOut size={18} /> Exit System
-          </button>
-        </div>
-      </aside>
-
+    <div className="flex min-h-screen bg-slate-900 text-slate-100 relative"> 
+     <Sidebar />
       {/* Main Content Area */}
       <main className="flex-1 p-8 overflow-y-auto">
         <header className="flex justify-between items-center mb-10">
