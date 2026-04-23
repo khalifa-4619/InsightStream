@@ -61,14 +61,32 @@ class InsightEngine:
         
         stats = {}
         for col in numeric_df.columns:
-            # We use the local numeric_df variable here
+            if col.lower() == 'id':
+                continue
+            series = numeric_df[col].dropna()
+            
+            # 1. Calculate Histogram with bin edges
+            counts, bin_edges = np.histogram(series, bins=10)
+            
+            # 2. Format for Recharts: [{"name": "10-20", "value": 50}, ...]
+            formatted_hist = []
+            for i in range(len(counts)):
+                # Create a label like "10.5 - 20.1"
+                bin_label = f"{round(bin_edges[i], 1)}-{round(bin_edges[i+1], 1)}"
+                formatted_hist.append({
+                    "name": bin_label, 
+                    "value": int(counts[i]) # JS likes standard ints
+                })
+
             stats[col] = {
-                "mean": round(float(numeric_df[col].mean()), 2),
-                "median": round(float(numeric_df[col].median()), 2),
-                "std": round(float(numeric_df[col].std()), 2),
-                "min": float(numeric_df[col].min()),
-                "max": float(numeric_df[col].max()),
-                "histogram": np.histogram(numeric_df[col].dropna(), bins=10)[0].tolist()
+                "summary": {
+                    "mean": round(float(series.mean()), 2),
+                    "median": round(float(series.median()), 2),
+                    "std": round(float(series.std()), 2),
+                    "min": float(series.min()),
+                    "max": float(series.max()),
+                },
+                "histogram": formatted_hist
             }
         return stats
     

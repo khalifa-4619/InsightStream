@@ -6,12 +6,15 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar'; // Assuming you've extracted your Sidebar
+import DistributionChart from '../components/DistributionChart';
+
 
 const Analytics = () => {
   const [datasets, setDatasets] = useState([]);
   const [selectedDs, setSelectedDs] = useState(null);
   const [activeTab, setActiveTab] = useState('laundry'); // laundry, eda, ml
   const [loading, setLoading] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -52,6 +55,8 @@ const Analytics = () => {
         }
       });
       alert("System Refined: Missing values handled and data normalized.");
+    } else if (taskType === 'univariate') {
+      setAnalysisResult(response.data);
     }
     
     // For EDA, you would store this in a different state to show charts
@@ -207,19 +212,37 @@ const Analytics = () => {
 
                   {/* EDA ENGINE VIEW */}
                   {activeTab === 'eda' && (
-                    <div className="flex flex-col items-center justify-center h-full py-20 animate-in fade-in duration-500 text-center">
-                       <BarChart3 size={48} className="text-indigo-500/20 mb-4" />
-                       <h3 className="text-lg font-bold">Visual Analysis Engine</h3>
-                       <button 
-                            onClick={() => runOperation('univariate')}
-                            className="mt-6 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all"
+                    <div className="space-y-6 animate-in fade-in duration-500">
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <h3 className="text-xl font-bold">Visual Analysis Engine</h3>
+                          <p className="text-slate-400 text-sm">Automated statistical distribution for numerical features.</p>
+                        </div>
+                        <button 
+                          onClick={() => runOperation('univariate')}
+                          disabled={loading}
+                          className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50"
                         >
-                            Run Statistical Analysis <ArrowRight size={18} />
+                          {loading ? "Analyzing..." : "Generate Insights"}
                         </button>
+                      </div>
 
-                        <p className="text-slate-500 text-sm max-w-sm mt-4">
-                            This will generate univariate and bivariate trends for {selectedDs.filename}.
-                        </p>
+                      {analysisResult ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {Object.entries(analysisResult).map(([colName, colData]) => (
+                            <DistributionChart 
+                              key={colName} 
+                              title={colName} 
+                              data={colData.histogram} 
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-slate-800 rounded-3xl">
+                          <BarChart3 size={48} className="text-slate-700 mb-4" />
+                          <p className="text-slate-500">Click "Generate Insights" to process the distribution logs.</p>
+                        </div>
+                      )}
                     </div>
                   )}
 
