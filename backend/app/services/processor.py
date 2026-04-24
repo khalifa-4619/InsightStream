@@ -92,13 +92,34 @@ class InsightEngine:
     
     def get_bivariate(self):
         target_df = self._get_working_df()
+        # skip 'id'
         numeric_df = target_df.select_dtypes(include=[np.number])
-        
-        if numeric_df.empty:
+        if 'id' in [c.lower() for c in numeric_df.columns]:
+            numeric_df = numeric_df.drop(columns=[col for col in numeric_df.columns if col.lower() == 'id'])
+  
+        if numeric_df.empty or len(numeric_df.columns) < 2:
             return {}
-        # Returns correlation matrix as a dictionary for JSON
-        return numeric_df.corr().to_dict()
-    
+        
+        # Calculate the correlation matrix
+        corr_matrix = numeric_df.corr().round(2)
+        
+        formatted_corr = []
+        cols = corr_matrix.columns.tolist()
+        
+        for i, row_name in enumerate(cols):
+            for j, col_name in enumerate(cols):
+                formatted_corr.append({
+                    "x": row_name,
+                    "y": col_name,
+                    "value": float(corr_matrix.iloc[i, j])
+                })
+        
+        return {
+            "matrix": formatted_corr,
+            "columns": cols
+        }
+        
+
     def get_multivariate(self):
         target_df = self._get_working_df()
         numeric_df = target_df.select_dtypes(include=[np.number])

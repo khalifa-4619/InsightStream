@@ -9,24 +9,24 @@ const DistributionChart = ({ data, title }) => {
         {title} Distribution
       </h4>
       <div className="flex-1 w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="99%" height="100%">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-            <XAxis 
-              dataKey="name" 
-              stroke="#64748b" 
-              fontSize={10} 
-              tickLine={false} 
+            <XAxis
+              dataKey="name"
+              stroke="#64748b"
+              fontSize={10}
+              tickLine={false}
               axisLine={false}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
               itemStyle={{ color: '#818cf8' }}
             />
-            <Bar 
-              dataKey="value" 
-              fill="#6366f1" 
-              radius={[4, 4, 0, 0]} 
+            <Bar
+              dataKey="value"
+              fill="#6366f1"
+              radius={[4, 4, 0, 0]}
               barSize={30}
             />
           </BarChart>

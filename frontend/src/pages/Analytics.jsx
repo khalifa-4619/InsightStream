@@ -15,6 +15,7 @@ const Analytics = () => {
   const [activeTab, setActiveTab] = useState('laundry'); // laundry, eda, ml
   const [loading, setLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [correlationData, setCorrelationData] = useState(null);
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -38,6 +39,10 @@ const Analytics = () => {
   setLoading(true);
   try {
     const token = localStorage.getItem('token');
+      if (!token) {
+      console.error("No token found");
+      return;
+    }
     const response = await axios.post(
       `http://127.0.0.1:8000/api/process/${selectedDs.id}?task=${taskType}`,
       {}, // Empty body because we use query params
@@ -57,6 +62,10 @@ const Analytics = () => {
       alert("System Refined: Missing values handled and data normalized.");
     } else if (taskType === 'univariate') {
       setAnalysisResult(response.data);
+      setCorrelationData(null);
+    } else if (taskType === 'bivariate') {
+      setAnalysisResult(null);
+      setCorrelationData(response.data);
     }
     
     // For EDA, you would store this in a different state to show charts
@@ -218,13 +227,31 @@ const Analytics = () => {
                           <h3 className="text-xl font-bold">Visual Analysis Engine</h3>
                           <p className="text-slate-400 text-sm">Automated statistical distribution for numerical features.</p>
                         </div>
-                        <button 
-                          onClick={() => runOperation('univariate')}
-                          disabled={loading}
-                          className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50"
-                        >
-                          {loading ? "Analyzing..." : "Generate Insights"}
-                        </button>
+                        <div className="flex gap-2">
+                          <button 
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); runOperation('univariate'); }}
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                              analysisResult // If we have univariate data, highlight this button
+                              ? 'bg-indigo-600 text-white' 
+                              : 'border border-slate-700 text-slate-300'
+                            }`}
+                          >
+                            {loading ? "..." : "Distributions"}
+                          </button>
+
+                          <button 
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); runOperation('bivariate'); }}
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                              correlationData // If we have correlation data, highlight this button
+                              ? 'bg-indigo-600 text-white' 
+                              : 'border border-slate-700 text-slate-300'
+                            }`}
+                          >
+                            {loading ? "..." : "Correlations"}
+                          </button>
+                        </div>
                       </div>
 
                       {analysisResult ? (
@@ -238,14 +265,71 @@ const Analytics = () => {
                           ))}
                         </div>
                       ) : (
+                        !correlationData && (
                         <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-slate-800 rounded-3xl">
                           <BarChart3 size={48} className="text-slate-700 mb-4" />
                           <p className="text-slate-500">Click "Generate Insights" to process the distribution logs.</p>
                         </div>
+                        )
                       )}
                     </div>
                   )}
+                  {correlationData && (
+                      <div className="mt-0 space-y-4 animate-in slide-in-from-bottom duration-700">
+                        <h3 className="text-lg font-bold text-slate-200">Feature Correlation Matrix</h3>
+                        
+                        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 overflow-x-auto">
+                          <div 
+                            className="grid gap-1"
+                            style={{ 
+                              // +1 to account for the row labels column
+                              gridTemplateColumns: `80px repeat(${correlationData.columns.length}, minmax(60px, 1fr))` 
+                            }}
+                          >
+                            {/* 🏷️ Top Header Row */}
+                            <div className="w-[80px]"></div>
+                            {correlationData.columns.map(col => (
+                              <div key={col} className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter text-center pb-2">
+                                {col}
+                              </div>
+                            ))}
 
+                            {/* 🧬 Matrix Rows */}
+                            {correlationData.columns.map((rowName, rowIndex) => (
+                              <React.Fragment key={rowName}>
+                                {/* Left Sidebar Label */}
+                                <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center pr-2">
+                                  {rowName}
+                                </div>
+
+                                {/* Data Cells for this row */}
+                                {correlationData.matrix
+                                  .filter(cell => cell.x === rowName)
+                                  .map((cell, cellIndex) => {
+                                    const opacity = Math.abs(cell.value);
+                                    const bgColor = cell.value > 0 
+                                      ? `rgba(99, 102, 241, ${opacity})` 
+                                      : `rgba(239, 68, 68, ${opacity})`;
+
+                                    return (
+                                      <div 
+                                        key={cellIndex}
+                                        className="aspect-square flex items-center justify-center rounded-sm transition-all hover:scale-110 hover:z-10 cursor-help"
+                                        style={{ backgroundColor: bgColor }}
+                                        title={`${cell.x} vs ${cell.y}: ${cell.value}`}
+                                      >
+                                        <span className={`text-[10px] font-bold ${opacity > 0.5 ? 'text-white' : 'text-slate-400'}`}>
+                                          {cell.value.toFixed(2)}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                 </div>
               </div>
             )}
