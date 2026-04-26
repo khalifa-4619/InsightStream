@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import DataIngestion from '../components/DataIngestion';
+import DataIngestion from '../components/DataIngestion'
 import Sidebar from '../components/Sidebar';
 
 const Dashboard = () => {

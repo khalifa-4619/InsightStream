@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Wand2, BarChart3, BrainCircuit, Terminal, 
-  Search, ShieldCheck, Database, Layout, 
-  ArrowRight, CheckCircle2, AlertCircle, FileText
+import {
+  Wand2, BarChart3, BrainCircuit, Terminal,
+  Search, ShieldCheck, Database, Layout,
+  ArrowRight, CheckCircle2, AlertCircle, FileText,
 } from 'lucide-react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar'; // Assuming you've extracted your Sidebar
 import DistributionChart from '../components/DistributionChart';
+import GlobalInsightCard from '../components/GlobalInsight';
 
 
 const Analytics = () => {
@@ -16,6 +17,7 @@ const Analytics = () => {
   const [loading, setLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [correlationData, setCorrelationData] = useState(null);
+  const [globalInsights, setGlobalInsights] = useState(null);
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -34,50 +36,53 @@ const Analytics = () => {
 
   // Backend Integration
   const runOperation = async (taskType) => {
-  if (!selectedDs) return;
-  
-  setLoading(true);
-  try {
-    const token = localStorage.getItem('token');
+    if (!selectedDs) return;
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
       if (!token) {
-      console.error("No token found");
-      return;
-    }
-    const response = await axios.post(
-      `http://127.0.0.1:8000/api/process/${selectedDs.id}?task=${taskType}`,
-      {}, // Empty body because we use query params
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+        console.error("No token found");
+        return;
+      }
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/process/${selectedDs.id}?task=${taskType}`,
+        {}, // Empty body because we use query params
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    // If we just cleaned the data, update the UI stats!
-    if (taskType === 'clean') {
-      setSelectedDs({
-        ...selectedDs,
-        summary_stats: {
-          ...selectedDs.summary_stats,
-          missing_values: response.data.nulls_remaining, // Should be 0 now!
-          preview: response.data.preview
-        }
-      });
-      alert("System Refined: Missing values handled and data normalized.");
-    } else if (taskType === 'univariate') {
-      setAnalysisResult(response.data);
-      setCorrelationData(null);
-    } else if (taskType === 'bivariate') {
-      setAnalysisResult(null);
-      setCorrelationData(response.data);
-    }
-    
-    // For EDA, you would store this in a different state to show charts
-    console.log("Analysis Result:", response.data);
+      // If we just cleaned the data, update the UI stats!
+      if (taskType === 'clean') {
+        setSelectedDs({
+          ...selectedDs,
+          summary_stats: {
+            ...selectedDs.summary_stats,
+            missing_values: response.data.nulls_remaining, // Should be 0 now!
+            preview: response.data.preview
+          }
+        });
+        alert("System Refined: Missing values handled and data normalized.");
+      } else if (taskType === 'univariate') {
+        setAnalysisResult({
+          univariate: response.data.univariate,
+        });
+        setGlobalInsights(response.data?.global_insights || null)
+        setCorrelationData(null);
+      } else if (taskType === 'bivariate') {
+        setAnalysisResult(null);
+        setCorrelationData(response.data);
+      }
 
-  } catch (err) {
-    console.error("Engine Failure:", err);
-    alert("Check terminal: Processor encountered an error.");
-  } finally {
-    setLoading(false);
-  }
-};
+      // For EDA, you would store this in a different state to show charts
+      console.log("Analysis Result:", response.data);
+
+    } catch (err) {
+      console.error("Engine Failure:", err);
+      alert("Check terminal: Processor encountered an error.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-slate-900 text-slate-100">
@@ -94,24 +99,23 @@ const Analytics = () => {
         </header>
 
         <div className="grid grid-cols-12 gap-8">
-          
+
           {/* --- LEFT: DATASET SELECTOR --- */}
           <div className="col-span-12 lg:col-span-3 space-y-4">
             <div className="flex justify-between items-center px-1">
               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Source Streams</h3>
               <span className="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400 font-mono">{datasets.length}</span>
             </div>
-            
+
             <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
               {datasets.map((ds) => (
                 <button
                   key={ds.id}
                   onClick={() => setSelectedDs(ds)}
-                  className={`w-full p-4 rounded-xl border text-left transition-all group ${
-                    selectedDs?.id === ds.id 
-                    ? 'bg-indigo-600/10 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.1)]' 
+                  className={`w-full p-4 rounded-xl border text-left transition-all group ${selectedDs?.id === ds.id
+                    ? 'bg-indigo-600/10 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.1)]'
                     : 'bg-slate-950 border-slate-800 hover:border-slate-700'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${selectedDs?.id === ds.id ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-400'}`}>
@@ -143,22 +147,22 @@ const Analytics = () => {
               </div>
             ) : (
               <div className="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden min-h-[70vh] flex flex-col">
-                
+
                 {/* Lab Navigation */}
                 <div className="flex border-b border-slate-800 bg-slate-950/50">
-                  <button 
+                  <button
                     onClick={() => setActiveTab('laundry')}
                     className={`flex-1 flex items-center justify-center gap-2 py-4 text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'laundry' ? 'text-indigo-400 border-b-2 border-indigo-500 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300'}`}
                   >
                     <Wand2 size={16} /> Data Laundry
                   </button>
-                  <button 
+                  <button
                     onClick={() => setActiveTab('eda')}
                     className={`flex-1 flex items-center justify-center gap-2 py-4 text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'eda' ? 'text-indigo-400 border-b-2 border-indigo-500 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300'}`}
                   >
                     <BarChart3 size={16} /> EDA Engine
                   </button>
-                  <button 
+                  <button
                     className="flex-1 flex items-center justify-center gap-2 py-4 text-xs font-bold uppercase tracking-wider text-slate-700 cursor-not-allowed group relative"
                   >
                     <BrainCircuit size={16} /> ML Models
@@ -168,7 +172,7 @@ const Analytics = () => {
 
                 {/* Lab Workspace Content */}
                 <div className="p-8 flex-1">
-                  
+
                   {/* DATA LAUNDRY VIEW */}
                   {activeTab === 'laundry' && (
                     <div className="space-y-8 animate-in fade-in duration-500">
@@ -177,7 +181,7 @@ const Analytics = () => {
                           <h3 className="text-xl font-bold">Sanitization Suite</h3>
                           <p className="text-slate-400 text-sm">Prepare your raw logs for statistical modeling.</p>
                         </div>
-                        <button 
+                        <button
                           onClick={() => runOperation('clean')}
                           disabled={loading}
                           className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold flex items-center gap-2 transition-all disabled:opacity-50"
@@ -228,26 +232,24 @@ const Analytics = () => {
                           <p className="text-slate-400 text-sm">Automated statistical distribution for numerical features.</p>
                         </div>
                         <div className="flex gap-2">
-                          <button 
+                          <button
                             type="button"
                             onClick={(e) => { e.preventDefault(); runOperation('univariate'); }}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                              analysisResult // If we have univariate data, highlight this button
-                              ? 'bg-indigo-600 text-white' 
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${analysisResult // If we have univariate data, highlight this button
+                              ? 'bg-indigo-600 text-white'
                               : 'border border-slate-700 text-slate-300'
-                            }`}
+                              }`}
                           >
                             {loading ? "..." : "Distributions"}
                           </button>
 
-                          <button 
+                          <button
                             type="button"
                             onClick={(e) => { e.preventDefault(); runOperation('bivariate'); }}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                              correlationData // If we have correlation data, highlight this button
-                              ? 'bg-indigo-600 text-white' 
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${correlationData // If we have correlation data, highlight this button
+                              ? 'bg-indigo-600 text-white'
                               : 'border border-slate-700 text-slate-300'
-                            }`}
+                              }`}
                           >
                             {loading ? "..." : "Correlations"}
                           </button>
@@ -255,81 +257,118 @@ const Analytics = () => {
                       </div>
 
                       {analysisResult ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {Object.entries(analysisResult).map(([colName, colData]) => (
-                            <DistributionChart 
-                              key={colName} 
-                              title={colName} 
-                              data={colData.histogram} 
-                            />
-                          ))}
+                        <div className="space-y-6">
+                          {/* 1. Global Intelligence Header (The Scorecard) */}
+                          <GlobalInsightCard data={globalInsights} />
+
+                          {/* 2. Grid of Distribution Charts with Smart Badges */}
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-w-100">
+                            {analysisResult?.univariate && typeof analysisResult.univariate === "object" && Object.entries(analysisResult.univariate).map(([colName, colData]) => (
+                              <div key={colName} className="p-4 bg-slate-900 border border-slate-800 rounded-2xl relative group">
+
+                                {/* Smart Insight Badges */}
+                                {Array.isArray(colData.insights) && colData.insights.length > 0 && (
+                                  <div className="absolute top-4 right-4 flex gap-1.5 z-10">
+                                    {colData.insights.map((ins, index) => (
+                                      <div
+                                        key={index}
+                                        title={ins.text}
+                                        className={`w-2.5 h-2.5 rounded-full cursor-help ${ins.type === 'critical' ? 'bg-red-500 animate-pulse' :
+                                          ins.type === 'warning' ? 'bg-amber-500' : 'bg-indigo-400'
+                                          }`}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+
+                                <DistributionChart
+                                  title={colName}
+                                  data={colData.histogram}
+                                />
+
+                                {/* Stats Summary - Using colData.summary correctly */}
+                                <div className="mt-4 pt-4 border-t border-slate-800/50 grid grid-cols-2 gap-4 text-[10px] font-mono">
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-500 uppercase">Mean</span>
+                                    <span className="text-indigo-400">{colData.summary?.mean != null ? colData.summary.mean.toFixed(2) : "--"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-500 uppercase">Median</span>
+                                    <span className="text-indigo-400">{colData.summary?.median}</span>
+                                  </div>
+                                  {/* ... etc ... */}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       ) : (
                         !correlationData && (
-                        <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-slate-800 rounded-3xl">
-                          <BarChart3 size={48} className="text-slate-700 mb-4" />
-                          <p className="text-slate-500">Click "Generate Insights" to process the distribution logs.</p>
-                        </div>
+                          <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-slate-800 rounded-3xl">
+                            <BarChart3 size={48} className="text-slate-700 mb-4" />
+                            <p className="text-slate-500">Click "Distributions" to process the logs.</p>
+                          </div>
                         )
                       )}
                     </div>
                   )}
                   {correlationData && (
-                      <div className="mt-0 space-y-4 animate-in slide-in-from-bottom duration-700">
-                        <h3 className="text-lg font-bold text-slate-200">Feature Correlation Matrix</h3>
-                        
-                        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 overflow-x-auto">
-                          <div 
-                            className="grid gap-1"
-                            style={{ 
-                              // +1 to account for the row labels column
-                              gridTemplateColumns: `80px repeat(${correlationData.columns.length}, minmax(60px, 1fr))` 
-                            }}
-                          >
-                            {/* 🏷️ Top Header Row */}
-                            <div className="w-[80px]"></div>
-                            {correlationData.columns.map(col => (
-                              <div key={col} className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter text-center pb-2">
-                                {col}
+                    <div className="mt-0 space-y-4 animate-in slide-in-from-bottom duration-700">
+                      <h3 className="text-lg font-bold text-slate-200">Feature Correlation Matrix</h3>
+
+                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 overflow-x-auto">
+                        <div
+                          className="grid gap-1"
+                          style={{
+                            // +1 to account for the row labels column
+                            gridTemplateColumns: `80px repeat(${correlationData?.columns?.length}, minmax(60px, 1fr))`
+                          }}
+                        >
+                          {/* 🏷️ Top Header Row */}
+                          <div className="w-[80px]"></div>
+                          {Array.isArray(correlationData?.columns) && correlationData.columns.map(col => (
+                            <div key={col} className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter text-center pb-2">
+                              {col}
+                            </div>
+                          ))}
+
+                          {/* 🧬 Matrix Rows */}
+                          {correlationData.columns.map((rowName, rowIndex) => (
+                            <React.Fragment key={rowName}>
+                              {/* Left Sidebar Label */}
+                              <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center pr-2">
+                                {rowName}
                               </div>
-                            ))}
 
-                            {/* 🧬 Matrix Rows */}
-                            {correlationData.columns.map((rowName, rowIndex) => (
-                              <React.Fragment key={rowName}>
-                                {/* Left Sidebar Label */}
-                                <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center pr-2">
-                                  {rowName}
-                                </div>
+                              {/* Data Cells for this row */}
+                              {correlationData.matrix
+                                .filter(cell => cell.x === rowName)
+                                .map((cell, cellIndex) => {
+                                  const opacity = Math.abs(cell.value);
+                                  const bgColor = cell.value > 0
+                                    ? `rgba(99, 102, 241, ${opacity})`
+                                    : `rgba(239, 68, 68, ${opacity})`;
 
-                                {/* Data Cells for this row */}
-                                {correlationData.matrix
-                                  .filter(cell => cell.x === rowName)
-                                  .map((cell, cellIndex) => {
-                                    const opacity = Math.abs(cell.value);
-                                    const bgColor = cell.value > 0 
-                                      ? `rgba(99, 102, 241, ${opacity})` 
-                                      : `rgba(239, 68, 68, ${opacity})`;
-
-                                    return (
-                                      <div 
-                                        key={cellIndex}
-                                        className="aspect-square flex items-center justify-center rounded-sm transition-all hover:scale-110 hover:z-10 cursor-help"
-                                        style={{ backgroundColor: bgColor }}
-                                        title={`${cell.x} vs ${cell.y}: ${cell.value}`}
-                                      >
-                                        <span className={`text-[10px] font-bold ${opacity > 0.5 ? 'text-white' : 'text-slate-400'}`}>
-                                          {cell.value.toFixed(2)}
-                                        </span>
-                                      </div>
-                                    );
-                                  })}
-                              </React.Fragment>
-                            ))}
-                          </div>
+                                  return (
+                                    <div
+                                      key={cellIndex}
+                                      className="aspect-square flex items-center justify-center rounded-sm transition-all hover:scale-110 hover:z-10 cursor-help"
+                                      style={{ backgroundColor: bgColor }}
+                                      title={`${cell.x} vs ${cell.y}: ${cell.value}`}
+                                    >
+                                      <span className={`text-[10px] font-bold ${opacity > 0.5 ? 'text-white' : 'text-slate-400'}`}>
+                                        {cell.value.toFixed(2)}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                            </React.Fragment>
+                          ))}
                         </div>
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

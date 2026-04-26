@@ -3,13 +3,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const DistributionChart = ({ data, title }) => {
   return (
-    <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl h-[300px] flex flex-col">
+    <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl h-[300px] flex flex-col min-h-[300px]">
       <h4 className="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
         {title} Distribution
       </h4>
       <div className="flex-1 w-full">
-        <ResponsiveContainer width="99%" height="100%">
+        <ResponsiveContainer width="100%" height={250}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
             <XAxis
