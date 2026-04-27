@@ -4,9 +4,12 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Analytics from './pages/Analytics';
+import { Toaster } from "sonner";
 
 function App() {
   return (
+    <>
+    <Toaster richColors position="top-right" />
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -32,6 +35,7 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
+    </>
   );
 }
 

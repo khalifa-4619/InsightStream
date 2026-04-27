@@ -5,19 +5,23 @@ import {
   ArrowRight, CheckCircle2, AlertCircle, FileText,
 } from 'lucide-react';
 import axios from 'axios';
-import Sidebar from '../components/Sidebar'; // Assuming you've extracted your Sidebar
+import Sidebar from '../components/Sidebar';
 import DistributionChart from '../components/DistributionChart';
 import GlobalInsightCard from '../components/GlobalInsight';
-
+import { toast } from "sonner"
 
 const Analytics = () => {
   const [datasets, setDatasets] = useState([]);
   const [selectedDs, setSelectedDs] = useState(null);
-  const [activeTab, setActiveTab] = useState('laundry'); // laundry, eda, ml
+  const [activeTab, setActiveTab] = useState('laundry');
   const [loading, setLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [correlationData, setCorrelationData] = useState(null);
   const [globalInsights, setGlobalInsights] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  
+  // Track if recommendations have been applied
+  const [recommendationsApplied, setRecommendationsApplied] = useState(false);
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -34,53 +38,117 @@ const Analytics = () => {
     fetchDatasets();
   }, []);
 
+  // Reset everything when selecting a new dataset
+  useEffect(() => {
+    console.log('🔄 Dataset changed, resetting all states');
+    setRecommendationsApplied(false);
+    setAnalysisResult(null);
+    setGlobalInsights(null);
+    setRecommendations([]);
+    setCorrelationData(null);
+  }, [selectedDs]);
+
   // Backend Integration
-  const runOperation = async (taskType) => {
+  const runOperation = async (taskType, payload = {}) => {
     if (!selectedDs) return;
 
+    console.log(`🚀 Starting operation: ${taskType}`, { payload });
     setLoading(true);
+    
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         console.error("No token found");
         return;
       }
+
       const response = await axios.post(
         `http://127.0.0.1:8000/api/process/${selectedDs.id}?task=${taskType}`,
-        {}, // Empty body because we use query params
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // If we just cleaned the data, update the UI stats!
+      console.log(`✅ Response received for ${taskType}:`, response.data);
+
       if (taskType === 'clean') {
         setSelectedDs({
           ...selectedDs,
           summary_stats: {
             ...selectedDs.summary_stats,
-            missing_values: response.data.nulls_remaining, // Should be 0 now!
+            missing_values: response.data.nulls_remaining,
             preview: response.data.preview
           }
         });
-        alert("System Refined: Missing values handled and data normalized.");
+        toast.success("System Refined: Missing values handled and data normalized.");
+        
       } else if (taskType === 'univariate') {
+        console.log('📊 Setting univariate data and insights');
         setAnalysisResult({
           univariate: response.data.univariate,
         });
-        setGlobalInsights(response.data?.global_insights || null)
+        setGlobalInsights(response.data?.global_insights || null);
+        const recs = response.data?.global_insights?.recommendations || [];
+        console.log('💡 Recommendations found:', recs.length);
+        setRecommendations(recs);
         setCorrelationData(null);
+        toast.success("Analysis complete");
+        
       } else if (taskType === 'bivariate') {
+        console.log('🔗 Setting correlation data');
         setAnalysisResult(null);
         setCorrelationData(response.data);
-      }
+        
+      } else if (taskType === "apply_recommendations") {
+          console.log('🎯 Apply recommendations response:', response.data);
+          toast.success("Recommendations applied successfully 🎯");
 
-      // For EDA, you would store this in a different state to show charts
-      console.log("Analysis Result:", response.data);
-
+          // Update the analysis result with data from the response
+          if (response.data.univariate) {
+            setAnalysisResult({
+              univariate: response.data.univariate,
+            });
+          }
+          
+          // Update global insights with new health score
+          if (response.data.global_insights) {
+            setGlobalInsights(response.data.global_insights);
+            
+            const newScore = response.data.global_insights.data_quality_score || 0;
+            const remainingRecs = response.data.global_insights.recommendations || [];
+            const remainingIssues = response.data.global_insights.top_issues || [];
+            
+            console.log('📊 New Score:', newScore);
+            console.log('📊 Remaining recommendations:', remainingRecs.length);
+            
+            // ✨ Auto-disable logic: Score > 80% OR no more critical issues
+            if (newScore >= 80 || remainingRecs.length === 0 || 
+                !remainingIssues.some(issue => issue.type === 'critical')) {
+              setRecommendationsApplied(true);
+              setRecommendations([]);
+              toast.success("Data quality is now optimal! 🎉");
+            } else {
+              // Still have work to do
+              setRecommendationsApplied(false);
+              setRecommendations(remainingRecs);
+              toast.info(`Score: ${newScore}%. More improvements available.`);
+            }
+          } else {
+            setRecommendationsApplied(true);
+            setRecommendations([]);
+          }
+          
+          // Clear any correlation data
+          setCorrelationData(null);
+          
+          console.log('✅ UI state updated with fresh data from backend');
+        }
     } catch (err) {
       console.error("Engine Failure:", err);
-      alert("Check terminal: Processor encountered an error.");
+      console.error("Error details:", err.response?.data);
+      toast.error("Check terminal: Processor encountered an error.");
     } finally {
       setLoading(false);
+      console.log('🏁 Operation completed');
     }
   };
 
@@ -235,7 +303,7 @@ const Analytics = () => {
                           <button
                             type="button"
                             onClick={(e) => { e.preventDefault(); runOperation('univariate'); }}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${analysisResult // If we have univariate data, highlight this button
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${analysisResult
                               ? 'bg-indigo-600 text-white'
                               : 'border border-slate-700 text-slate-300'
                               }`}
@@ -246,7 +314,7 @@ const Analytics = () => {
                           <button
                             type="button"
                             onClick={(e) => { e.preventDefault(); runOperation('bivariate'); }}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${correlationData // If we have correlation data, highlight this button
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${correlationData
                               ? 'bg-indigo-600 text-white'
                               : 'border border-slate-700 text-slate-300'
                               }`}
@@ -260,9 +328,35 @@ const Analytics = () => {
                         <div className="space-y-6">
                           {/* 1. Global Intelligence Header (The Scorecard) */}
                           <GlobalInsightCard data={globalInsights} />
+                          
+                          {/* Show button only if there are recommendations AND they haven't been applied */}
+                          {recommendations.length > 0 && !recommendationsApplied && (
+                            <div className="flex justify-end">
+                              <button
+                                onClick={() =>
+                                  runOperation("apply_recommendations", {
+                                    recommendations: recommendations,
+                                  })
+                                }
+                                disabled={loading}
+                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                              >
+                                {loading ? "Applying..." : "Apply AI Recommendations"}
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Show success message when recommendations are applied */}
+                          {recommendationsApplied && (
+                            <div className="flex justify-end">
+                              <div className="px-4 py-2 bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-bold flex items-center gap-2">
+                                <CheckCircle2 size={14} />
+                                Data optimized successfully
+                              </div>
+                            </div>
+                          )}
 
                           {/* 2. Grid of Distribution Charts with Smart Badges */}
-
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-w-100">
                             {analysisResult?.univariate && typeof analysisResult.univariate === "object" && Object.entries(analysisResult.univariate).map(([colName, colData]) => (
                               <div key={colName} className="p-4 bg-slate-900 border border-slate-800 rounded-2xl relative group">
@@ -287,7 +381,7 @@ const Analytics = () => {
                                   data={colData.histogram}
                                 />
 
-                                {/* Stats Summary - Using colData.summary correctly */}
+                                {/* Stats Summary */}
                                 <div className="mt-4 pt-4 border-t border-slate-800/50 grid grid-cols-2 gap-4 text-[10px] font-mono">
                                   <div className="flex justify-between">
                                     <span className="text-slate-500 uppercase">Mean</span>
@@ -297,7 +391,6 @@ const Analytics = () => {
                                     <span className="text-slate-500 uppercase">Median</span>
                                     <span className="text-indigo-400">{colData.summary?.median}</span>
                                   </div>
-                                  {/* ... etc ... */}
                                 </div>
                               </div>
                             ))}
@@ -321,11 +414,9 @@ const Analytics = () => {
                         <div
                           className="grid gap-1"
                           style={{
-                            // +1 to account for the row labels column
                             gridTemplateColumns: `80px repeat(${correlationData?.columns?.length}, minmax(60px, 1fr))`
                           }}
                         >
-                          {/* 🏷️ Top Header Row */}
                           <div className="w-[80px]"></div>
                           {Array.isArray(correlationData?.columns) && correlationData.columns.map(col => (
                             <div key={col} className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter text-center pb-2">
@@ -333,15 +424,12 @@ const Analytics = () => {
                             </div>
                           ))}
 
-                          {/* 🧬 Matrix Rows */}
                           {correlationData.columns.map((rowName, rowIndex) => (
                             <React.Fragment key={rowName}>
-                              {/* Left Sidebar Label */}
                               <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center pr-2">
                                 {rowName}
                               </div>
 
-                              {/* Data Cells for this row */}
                               {correlationData.matrix
                                 .filter(cell => cell.x === rowName)
                                 .map((cell, cellIndex) => {

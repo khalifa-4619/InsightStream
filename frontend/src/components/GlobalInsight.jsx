@@ -6,12 +6,12 @@ const GlobalInsightCard = ({ data }) => {
   // ✅ Hard guard
   if (!data) return null;
 
-  // ✅ Safe destructuring with defaults
+  // ✅ Safe destructuring
   const {
     data_quality_score = 0,
     top_issues = [],
     recommendations = []
-  } = data;
+  } = data || {};
 
   const getScoreColor = (score) => {
     if (score > 80) return 'text-green-500';
@@ -19,8 +19,13 @@ const GlobalInsightCard = ({ data }) => {
     return 'text-red-500';
   };
 
+  const formatAction = (action) => {
+    if (!action) return "";
+    return action.replaceAll("_", " ");
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full ">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full">
 
       {/* SCORE */}
       <motion.div 
@@ -50,7 +55,10 @@ const GlobalInsightCard = ({ data }) => {
             <p className="text-slate-500 text-sm">No major issues detected 🎉</p>
           ) : (
             top_issues.map((issue, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg border-l-4 border-amber-500">
+              <div
+                key={idx}
+                className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg border-l-4 border-amber-500"
+              >
                 <span className="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-xs font-bold uppercase mt-0.5">
                   {issue.column || "General"}
                 </span>
@@ -75,9 +83,22 @@ const GlobalInsightCard = ({ data }) => {
             <p className="text-slate-500 text-sm">No recommendations</p>
           ) : (
             recommendations.map((rec, idx) => (
-              <div key={idx} className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-4 py-2 rounded-full text-sm flex items-center gap-2">
+              <div
+                key={idx}
+                className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-4 py-2 rounded-full text-sm flex items-center gap-2 hover:bg-indigo-500/20 transition-all"
+                title={`${rec.action} on ${rec.column}`}
+              >
                 <CheckCircle size={14} />
-                {rec}
+
+                <span className="font-mono text-indigo-400">
+                  {formatAction(rec.action)}
+                </span>
+
+                {rec.column && (
+                  <span className="text-slate-400">
+                    ({rec.column})
+                  </span>
+                )}
               </div>
             ))
           )}

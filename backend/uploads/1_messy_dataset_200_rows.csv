@@ -1,0 +1,201 @@
+Customer_ID,Full_Name,Email,Gender,Age,Country,Purchase_Amount,Purchase_Date,Product_Category
+001, chris ,invalidemail@,Female,,,18626,2024-02-22,Beauty
+002,Jane Davis,janedavis@gmail.com,Male,,Uk,11747,2024-01-29,Electronics
+003,EMILY,emily@gmail.com,FEMALE,twenty,Nigeria,not available,2024/01/22,Fashion
+004,sarah Lee,sarahlee@gmail.com,MALE,35,Nigeria,,12-04-2024,Beauty
+005, EMILY Brown ,invalidemail@,male,twenty,UK,18660,2024/12/24,electronics
+006,James Lee,,,27,UK,not available,12-09-2024,
+007,john Lee,johnlee@gmail.com,Male,,Uk,not available,2024-11-01,FASHION
+008,Jane King,invalidemail@,Male,,nigeria,40885,10/10/2024,Electronics
+009,sarah Lee,sarahlee@gmail.com,Female,,nigeria,not available,09/04/2024,Electronics
+010,James Wilson,jameswilson@gmail.com,male,twenty,NIGERIA,33779,2024/07/27,electronics
+011,chris Smith,chrissmith@gmail.com,male,33,USA,not available,05/05/2024,Electronics
+012, James King ,,Female,,nigeria,5841,11/03/2024,Beauty
+013,chris Wilson,chriswilson@gmail.com,,twenty,,not available,2024-11-29,FASHION
+014,Smith,smith@gmail.com,Male,25,Canada,9634,2024-01-29,
+015,david King,invalidemail@,MALE,thirty,Uk,,2024/12/06,Fashion
+016, michael King ,michaelking@gmail.com,MALE,thirty,Nigeria,,2024-01-23,Fashion
+017,EMILY White,emilywhite@gmail.com,FEMALE,thirty,Uk,35996,2024-01-29,Beauty
+018, david Lee ,davidlee@gmail.com,male,twenty,UK,not available,2024-06-13,Fashion
+019,anna Lee,annalee@gmail.com,male,twenty,UK,not available,2024-06-01,electronics
+020,James doe,,,thirty,Uk,40773,29/02/2024,
+021,michael doe,michaeldoe@gmail.com,Female,thirty,NIGERIA,,2024-04-28,Beauty
+022,john Davis,johndavis@gmail.com,male,39,,not available,04/11/2024,Fashion
+023,michael Lee,michaellee@gmail.com,MALE,,Nigeria,8377,09/08/2024,Fashion
+024, Jane Wilson ,janewilson@gmail.com,male,twenty,USA,not available,2024/02/14,Electronics
+025,Jane Smith,janesmith@gmail.com,FEMALE,twenty,UK,not available,04/10/2024,Electronics
+026, EMILY Smith ,emilysmith@gmail.com,MALE,,,not available,2024/01/10,electronics
+027, john Smith ,invalidemail@,,,usa,,2024/12/16,Electronics
+028, sarah King ,,Male,twenty,UK,8617,28/12/2024,electronics
+029,anna White,annawhite@gmail.com,,twenty,Uk,,05-10-2024,Fashion
+030,chris Brown,chrisbrown@gmail.com,FEMALE,,UK,not available,10-05-2024,Electronics
+031,EMILY doe,emilydoe@gmail.com,MALE,thirty,Nigeria,not available,2024/01/08,Beauty
+032,EMILY White,emilywhite@gmail.com,,23,Canada,,2024/07/19,Electronics
+033,chris doe,invalidemail@,MALE,thirty,Uk,,25-04-2024,FASHION
+034,EMILY Brown,,FEMALE,twenty,usa,35626,20-08-2024,FASHION
+035,anna Smith,invalidemail@,Male,thirty,NIGERIA,not available,2024/08/19,electronics
+036,david Davis,invalidemail@,Female,twenty,Canada,,2024-06-13,Electronics
+037, sarah ,sarah@gmail.com,male,twenty,nigeria,,2024/07/09,FASHION
+038,sarah Johnson,sarahjohnson@gmail.com,Female,30,Canada,not available,2024/09/05,Electronics
+039,Davis,davis@gmail.com,Male,twenty,USA,not available,2024-06-20,FASHION
+040,EMILY Smith,emilysmith@gmail.com,male,,usa,,2024/07/21,
+041,anna Brown,annabrown@gmail.com,MALE,thirty,USA,,2024-09-20,electronics
+042,anna doe,annadoe@gmail.com,male,thirty,Nigeria,,2024-02-19,electronics
+043,sarah,,,35,USA,,2024-08-09,Fashion
+044,john,invalidemail@,male,twenty,usa,not available,2024/05/10,Beauty
+045,chris White,,Male,,usa,,2024-02-23,FASHION
+046,chris White,,FEMALE,45,Canada,30899,2024-05-27,Electronics
+047,White,invalidemail@,MALE,twenty,nigeria,,2024/06/21,electronics
+048,James Brown,jamesbrown@gmail.com,FEMALE,twenty,NIGERIA,28530,2024/05/23,
+049, david White ,invalidemail@,,,nigeria,,17/09/2024,Electronics
+050,michael Wilson,,male,42,,11325,2024-05-14,electronics
+051,john doe,johndoe@gmail.com,Female,thirty,USA,17712,06-05-2024,Fashion
+052,john Davis,johndavis@gmail.com,male,39,,,15-12-2024,
+053,chris Wilson,chriswilson@gmail.com,Female,twenty,Canada,not available,16/10/2024,FASHION
+054, Lee ,lee@gmail.com,FEMALE,23,usa,,2024-11-17,Fashion
+055,anna doe,annadoe@gmail.com,,twenty,USA,not available,2024-03-08,Fashion
+056,anna Johnson,invalidemail@,FEMALE,33,NIGERIA,not available,21/11/2024,FASHION
+057, michael doe ,michaeldoe@gmail.com,MALE,32,USA,24400,25-11-2024,FASHION
+058,Jane Johnson,janejohnson@gmail.com,FEMALE,,USA,not available,2024/11/23,electronics
+059,Wilson,invalidemail@,FEMALE,44,Canada,47939,2024/12/13,Electronics
+060,john doe,johndoe@gmail.com,,twenty,Canada,23617,09-12-2024,Beauty
+061,chris Brown,chrisbrown@gmail.com,,,nigeria,44719,11-12-2024,Electronics
+062,john Davis,invalidemail@,,twenty,nigeria,,23-05-2024,FASHION
+063,anna Smith,annasmith@gmail.com,Male,twenty,nigeria,not available,2024-12-30,FASHION
+064,anna Smith,annasmith@gmail.com,Female,,Uk,,2024/04/24,electronics
+065, john Wilson ,invalidemail@,Male,thirty,usa,23369,11-09-2024,
+066,chris Lee,chrislee@gmail.com,FEMALE,thirty,usa,not available,2024-12-14,
+067,chris Wilson,,,,usa,,2024-06-07,FASHION
+068,john,invalidemail@,Female,20,,not available,22/11/2024,electronics
+069, john Wilson ,johnwilson@gmail.com,,,,10069,20-02-2024,Electronics
+070,EMILY Lee,invalidemail@,Male,,USA,6639,2024-05-07,Beauty
+071,EMILY Johnson,emilyjohnson@gmail.com,Female,21,nigeria,46655,2024/06/07,
+072,White,white@gmail.com,male,32,Canada,,2024-10-03,Fashion
+073,chris Davis,chrisdavis@gmail.com,Male,thirty,Uk,49778,28-12-2024,FASHION
+074,James Brown,,MALE,22,Uk,38827,15-06-2024,Fashion
+075, john Johnson ,johnjohnson@gmail.com,Female,,UK,not available,2024/04/24,Electronics
+076,sarah,,Male,thirty,Uk,27172,2024-10-06,Electronics
+077, michael Smith ,michaelsmith@gmail.com,Male,,Uk,10588,2024/04/07,electronics
+078, michael Davis ,michaeldavis@gmail.com,Female,,Canada,20587,03-04-2024,Beauty
+079,sarah Brown,sarahbrown@gmail.com,MALE,twenty,Nigeria,not available,23/09/2024,
+080,john King,johnking@gmail.com,MALE,,,,2024/07/12,
+081,david doe,daviddoe@gmail.com,Female,thirty,,22802,2024-04-21,electronics
+082, Jane Wilson ,janewilson@gmail.com,MALE,28,usa,not available,12/11/2024,Electronics
+083,James Wilson,jameswilson@gmail.com,,,nigeria,26212,17/06/2024,
+084,chris Wilson,chriswilson@gmail.com,MALE,thirty,NIGERIA,not available,08/03/2024,FASHION
+085,chris White,chriswhite@gmail.com,,twenty,UK,24802,08/05/2024,FASHION
+086,anna Wilson,annawilson@gmail.com,,,UK,26584,19-04-2024,
+087,James,james@gmail.com,Female,33,NIGERIA,not available,19-09-2024,electronics
+088,chris Johnson,,male,thirty,Nigeria,18560,16/05/2024,
+089,Smith,smith@gmail.com,,twenty,Canada,,02/08/2024,electronics
+090,James King,jamesking@gmail.com,male,,Canada,15710,2024/12/30,Electronics
+091, Wilson ,wilson@gmail.com,Female,22,nigeria,not available,10-05-2024,Fashion
+092, sarah ,,,thirty,nigeria,,2024/07/10,Fashion
+093,david Smith,davidsmith@gmail.com,male,33,USA,37395,2024-02-03,Beauty
+094,anna Lee,annalee@gmail.com,Male,,NIGERIA,,2024/04/21,Fashion
+095, sarah doe ,invalidemail@,,27,UK,,2024/12/16,Electronics
+096,chris Brown,chrisbrown@gmail.com,,twenty,Uk,not available,2024-04-17,
+097, Davis ,,MALE,thirty,Uk,32278,26/05/2024,electronics
+098,Jane Johnson,janejohnson@gmail.com,,,UK,,03/01/2024,electronics
+099, James Smith ,invalidemail@,Female,41,,,07-07-2024,FASHION
+100,john doe,johndoe@gmail.com,MALE,twenty,UK,,06/01/2024,FASHION
+101,michael Wilson,michaelwilson@gmail.com,,,nigeria,44164,2024-03-28,electronics
+102,john Johnson,johnjohnson@gmail.com,MALE,27,NIGERIA,47058,2024-10-30,Electronics
+103, chris King ,,,37,,,2024/12/29,Electronics
+104,Jane Johnson,janejohnson@gmail.com,,twenty,Uk,not available,2024/01/21,electronics
+105, david doe ,daviddoe@gmail.com,FEMALE,thirty,,,2024-11-03,FASHION
+106,david Brown,davidbrown@gmail.com,FEMALE,thirty,Nigeria,18562,31-12-2024,electronics
+107,michael Wilson,michaelwilson@gmail.com,MALE,twenty,USA,not available,19/07/2024,Electronics
+108,sarah doe,sarahdoe@gmail.com,male,,UK,5340,22-11-2024,
+109,anna,,Male,45,UK,12403,27/09/2024,
+110, michael Lee ,michaellee@gmail.com,Male,24,Uk,,08/10/2024,FASHION
+111,EMILY Davis,emilydavis@gmail.com,,,nigeria,,2024/10/30,Electronics
+112,Lee,lee@gmail.com,male,,NIGERIA,20852,2024-12-18,
+113,sarah Wilson,invalidemail@,MALE,thirty,NIGERIA,not available,2024/06/11,Electronics
+114, James Lee ,,Female,26,Nigeria,,12/12/2024,electronics
+115,James Davis,invalidemail@,Male,,Uk,not available,11/07/2024,electronics
+116, EMILY doe ,emilydoe@gmail.com,MALE,twenty,Uk,,2024-04-21,FASHION
+117,EMILY King,invalidemail@,male,,nigeria,,2024-06-11,electronics
+118,anna White,invalidemail@,MALE,32,Canada,,2024/01/01,Fashion
+119, anna doe ,annadoe@gmail.com,Female,twenty,Canada,not available,2024/03/24,electronics
+120,James Wilson,,Female,,USA,not available,14/07/2024,electronics
+121, EMILY ,,FEMALE,thirty,Canada,40640,2024/04/16,
+122,doe,doe@gmail.com,MALE,thirty,USA,5065,2024-01-24,electronics
+123,john Wilson,johnwilson@gmail.com,,,NIGERIA,45038,01/08/2024,electronics
+124,sarah,invalidemail@,Male,,nigeria,15287,2024/09/13,Electronics
+125, anna Wilson ,invalidemail@,Male,twenty,Canada,not available,2024/10/27,
+126, john Johnson ,johnjohnson@gmail.com,Female,,Canada,9805,2024/03/21,
+127,James Brown,jamesbrown@gmail.com,FEMALE,,UK,,2024/01/16,Beauty
+128, EMILY Lee ,emilylee@gmail.com,MALE,,nigeria,not available,2024-09-12,Electronics
+129, James ,james@gmail.com,Male,23,Uk,not available,2024-05-28,electronics
+130,sarah Lee,sarahlee@gmail.com,FEMALE,43,usa,,09-09-2024,Fashion
+131,michael Lee,michaellee@gmail.com,Male,twenty,usa,,21-02-2024,Fashion
+132,chris King,chrisking@gmail.com,Male,,Nigeria,,24/03/2024,Electronics
+133, Jane Brown ,janebrown@gmail.com,Female,thirty,UK,22319,21/11/2024,Fashion
+134, michael Johnson ,invalidemail@,Female,,NIGERIA,,2024-05-14,Electronics
+135, Brown ,brown@gmail.com,FEMALE,twenty,USA,,2024/03/19,Beauty
+136,david Smith,davidsmith@gmail.com,Female,38,usa,,03-05-2024,FASHION
+137,Jane Johnson,invalidemail@,Female,twenty,USA,,2024-02-14,FASHION
+138,James Johnson,,male,26,nigeria,,24-12-2024,Beauty
+139,Jane Smith,,MALE,,Nigeria,not available,29-04-2024,Electronics
+140,michael Brown,invalidemail@,MALE,thirty,usa,15544,23-11-2024,Fashion
+141,chris,chris@gmail.com,MALE,25,USA,,07/03/2024,
+142,michael Smith,invalidemail@,FEMALE,twenty,Uk,,31-01-2024,electronics
+143, EMILY Davis ,emilydavis@gmail.com,MALE,twenty,UK,not available,10/04/2024,electronics
+144,chris Davis,chrisdavis@gmail.com,Female,twenty,USA,not available,24/10/2024,electronics
+145,Jane White,janewhite@gmail.com,Female,,UK,not available,2024/12/14,Beauty
+146,Jane Johnson,,FEMALE,twenty,NIGERIA,,06-06-2024,electronics
+147,Smith,smith@gmail.com,Male,twenty,Nigeria,,28-11-2024,Electronics
+148,john White,invalidemail@,Male,,nigeria,,2024/10/04,electronics
+149,michael Wilson,invalidemail@,Female,twenty,NIGERIA,47254,11-02-2024,
+150,david doe,daviddoe@gmail.com,male,18,Canada,not available,2024/05/01,FASHION
+151, john King ,johnking@gmail.com,,thirty,UK,,26-04-2024,Electronics
+152,EMILY doe,,male,18,nigeria,not available,2024-11-28,
+153, david Davis ,daviddavis@gmail.com,MALE,twenty,,32918,2024-06-09,electronics
+154,anna Johnson,annajohnson@gmail.com,,23,Uk,,2024-07-19,electronics
+155,chris Johnson,,Female,twenty,,,01/06/2024,electronics
+156,anna Wilson,annawilson@gmail.com,Female,,,5090,2024/05/15,FASHION
+157,EMILY Johnson,,MALE,,Uk,not available,2024-11-03,Beauty
+158,sarah Johnson,sarahjohnson@gmail.com,FEMALE,35,NIGERIA,48165,2024/03/26,FASHION
+159, john Johnson ,johnjohnson@gmail.com,Female,thirty,Nigeria,not available,08/06/2024,Electronics
+160,anna Lee,,,thirty,USA,not available,21-06-2024,Beauty
+161,Smith,smith@gmail.com,FEMALE,,Nigeria,,2024-02-15,FASHION
+162,sarah Brown,sarahbrown@gmail.com,Male,thirty,NIGERIA,not available,07/01/2024,Fashion
+163,anna Lee,annalee@gmail.com,MALE,,Nigeria,not available,28/12/2024,electronics
+164,King,king@gmail.com,Female,,nigeria,not available,2024-06-29,electronics
+165, anna King ,invalidemail@,Male,thirty,Uk,40368,06/07/2024,FASHION
+166,john King,invalidemail@,male,,Uk,,2024/10/23,Beauty
+167,chris Davis,chrisdavis@gmail.com,male,34,nigeria,40745,24/07/2024,
+168, michael Wilson ,michaelwilson@gmail.com,,,Uk,not available,14/01/2024,electronics
+169,john Davis,johndavis@gmail.com,FEMALE,twenty,UK,,2024/02/28,
+170,James Brown,invalidemail@,FEMALE,twenty,,10917,01-06-2024,Electronics
+171,EMILY doe,emilydoe@gmail.com,MALE,42,Canada,36164,2024-07-04,Beauty
+172, Jane Johnson ,,Male,,,,16-03-2024,
+173, michael Smith ,invalidemail@,Female,twenty,NIGERIA,13025,2024-12-24,FASHION
+174, James ,james@gmail.com,FEMALE,,nigeria,41296,27-08-2024,Fashion
+175,anna King,annaking@gmail.com,,twenty,Uk,,2024-05-26,Electronics
+176,sarah Brown,sarahbrown@gmail.com,FEMALE,25,Nigeria,,2024-05-23,Electronics
+177, anna Davis ,annadavis@gmail.com,MALE,33,UK,not available,2024/07/18,
+178,anna Brown,annabrown@gmail.com,,twenty,Nigeria,41279,2024-07-02,
+179,chris,invalidemail@,FEMALE,thirty,NIGERIA,,2024/05/04,Fashion
+180,chris Johnson,chrisjohnson@gmail.com,MALE,,Canada,30495,2024/07/24,Electronics
+181,James White,jameswhite@gmail.com,FEMALE,,USA,26497,2024/03/20,
+182, Davis ,davis@gmail.com,male,thirty,usa,,2024-02-20,Electronics
+183,sarah Wilson,sarahwilson@gmail.com,Female,45,NIGERIA,23442,16-03-2024,Fashion
+184,sarah Johnson,sarahjohnson@gmail.com,Female,34,Nigeria,,2024/11/12,FASHION
+185,chris King,chrisking@gmail.com,Male,thirty,usa,not available,07/04/2024,Fashion
+186,david Brown,davidbrown@gmail.com,FEMALE,28,Nigeria,not available,18-12-2024,FASHION
+187,michael Wilson,invalidemail@,male,twenty,Nigeria,,2024/05/17,FASHION
+188,chris White,invalidemail@,FEMALE,35,Canada,,12-03-2024,Beauty
+189,michael,michael@gmail.com,,thirty,Canada,not available,2024/12/19,Fashion
+190,david doe,daviddoe@gmail.com,male,25,NIGERIA,not available,2024-12-18,Electronics
+191,EMILY Johnson,emilyjohnson@gmail.com,male,,USA,,2024/06/19,Electronics
+192, chris Johnson ,invalidemail@,male,21,nigeria,7605,2024/04/04,Electronics
+193,anna King,,male,31,usa,not available,10-10-2024,Fashion
+194, chris Lee ,,Female,thirty,NIGERIA,not available,18/12/2024,FASHION
+195,EMILY Brown,emilybrown@gmail.com,MALE,twenty,,47376,24/11/2024,Electronics
+196,john Davis,johndavis@gmail.com,,thirty,USA,28128,18-02-2024,FASHION
+197,James doe,,FEMALE,twenty,Nigeria,,13/01/2024,Electronics
+198,chris,chris@gmail.com,Male,,nigeria,,2024-09-19,Electronics
+199,anna,,Male,twenty,nigeria,not available,06-12-2024,Beauty
+200,White,white@gmail.com,male,twenty,usa,not available,2024-10-02,
