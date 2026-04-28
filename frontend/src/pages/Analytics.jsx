@@ -404,9 +404,8 @@ const Analytics = () => {
                           </div>
                         )
                       )}
-                    </div>
-                  )}
-                  {correlationData && (
+
+                      {correlationData && (
                     <div className="mt-0 space-y-4 animate-in slide-in-from-bottom duration-700">
                       <h3 className="text-lg font-bold text-slate-200">Feature Correlation Matrix</h3>
 
@@ -457,6 +456,9 @@ const Analytics = () => {
                       </div>
                     </div>
                   )}
+                    </div>
+                  )}
+                  
                 </div>
               </div>
             )}

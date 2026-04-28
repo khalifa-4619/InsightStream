@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.dataset import Dataset
 from app.schemas.data_schema import DataFileCreate
 import math
+import os
 
 def create_dataset(db: Session, dataset: DataFileCreate, owner_id: int):
     # Convert Pydantic model to a raw dict 
@@ -28,7 +29,24 @@ def get_user_datasets(db: Session, owner_id: int):
     """
     return db.query(Dataset).filter(Dataset.owner_id == owner_id).order_by(Dataset.created_at.desc()).all()
 
-
+def delete_dataset(db: Session, dataset_id: int, owner_id: int):
+    db_dataset = db.query(Dataset).filter(
+        Dataset.id == dataset_id,
+        Dataset.owner_id == owner_id
+    ).first()
+    if not db_dataset:
+        return False
+    
+    if os.path.exists(db_dataset.filepath):
+        try:
+            os.remove(db_dataset.file_path)
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+    
+    db.delete(db_dataset)
+    db.commit()
+    return True
+    
 
 
 
