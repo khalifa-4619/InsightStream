@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException,UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException,UploadFile, File, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.dataset import Dataset
@@ -111,6 +112,10 @@ async def upload_dataset(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
+    # Keep a copy as the untouched original
+    original_path = os.path.join(UPLOAD_DIR, f"original_{current_user.id}_{file.filename}")
+    shutil.copy(file_path, original_path)
+        
     # Use the new generalized analyzer
     analysis_results = analyze_file(file_path)
     
@@ -121,6 +126,7 @@ async def upload_dataset(
     dataset_in = DataFileCreate(
         filename=file.filename,
         filepath=file_path,
+        original_filepath=original_path,
         file_typ=file_ext.replace('.', ''), # 'csv', 'xlsx', etc.
         summary_stats=analysis_results
     )
@@ -142,6 +148,65 @@ def list_datasets(
     """
     datasets = crud_dataset.get_user_datasets(db, owner_id=current_user.id)
     return datasets
+
+@app.delete("/datasets/{dataset_id}", status_code=status.HTTP_200_OK)
+def remove_dataset(
+    dataset_id: int,
+    db: Session = Depends(get_db),
+    current_user: User=Depends(user_crud.get_current_user)
+):
+    success = crud_dataset(
+        db=db,
+        dataset_id=dataset_id,
+        owner_id=current_user.id
+    )
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Dataset not found or unauthorized access."
+        )
+    return {"message": f"Dataset {dataset_id} and associated files have been purged."}
+
+@app.get("/datasets/{dataset_id}/download")
+def download_original_file(
+    dataset_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_crud.get_current_user)
+):
+    """Download the original uploaded file."""
+    dataset = crud_dataset.get_dataset(db, dataset_id, current_user.id)
+    if not dataset or not dataset.original_filepath:
+        raise HTTPException(status_code=404, detail="Original file not found")
+    if not os.path.exists(dataset.original_filepath):
+        raise HTTPException(status_code=404, detail="File not found on disk")
+    return FileResponse(
+        path=dataset.original_filepath,
+        filename=dataset.filename,
+        media_type='application/octet-stream'
+    )
+
+
+@app.get("/datasets/{dataset_id}/download/cleaned")
+def download_cleaned_file(
+    dataset_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_crud.get_current_user)
+):
+    """
+    Download the cleaned dataset (if it exists).
+    The cleaned file is saved at the same path as the original (after cleaning).
+    """
+    dataset = crud_dataset.get_dataset(db, dataset_id, current_user.id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    if not os.path.exists(dataset.filepath):
+        raise HTTPException(status_code=404, detail="File not found on disk")
+    
+    return FileResponse(
+        path=dataset.filepath,
+        filename=f"cleaned_{dataset.filename}",
+        media_type='application/octet-stream'
+    )
     
 # Mounting the analytics router
 app.include_router(analytics.router, prefix="/api")

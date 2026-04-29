@@ -8,7 +8,9 @@ import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import DistributionChart from '../components/DistributionChart';
 import GlobalInsightCard from '../components/GlobalInsight';
+import domtoimage from 'dom-to-image-more';
 import { toast } from "sonner"
+import { scale, transform } from 'framer-motion';
 
 const Analytics = () => {
   const [datasets, setDatasets] = useState([]);
@@ -149,6 +151,32 @@ const Analytics = () => {
     } finally {
       setLoading(false);
       console.log('🏁 Operation completed');
+    }
+  };
+  const exportReport = async () => {
+    const element = document.getElementById('eda-report-area');
+    if (!element) return;
+    try {
+      const dataUrl = await domtoimage.toPng(element, {
+        backgroundColor: '#0f172a',
+        quality: 1,
+        width: element.scrollWidth * 2,
+        height: element.scrollHeight * 2,
+        style: {
+          transform: 'scale(2)',
+          transformOrigin: 'top left',
+          width: element.scrollWidth + 'px',
+          height: element.scrollHeight + 'px',
+        },
+      });
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `insightstream-report-${Date.now()}.png`;
+      link.click();
+      toast.success('Report downloaded');
+    } catch (err) {
+      console.error('Export failed:', err);
+      toast.error('Export failed')
     }
   };
 
@@ -293,7 +321,7 @@ const Analytics = () => {
 
                   {/* EDA ENGINE VIEW */}
                   {activeTab === 'eda' && (
-                    <div className="space-y-6 animate-in fade-in duration-500">
+                    <div className="space-y-6 animate-in fade-in duration-500" id="eda-report-area">
                       <div className="flex justify-between items-end">
                         <div>
                           <h3 className="text-xl font-bold">Visual Analysis Engine</h3>
@@ -321,6 +349,15 @@ const Analytics = () => {
                           >
                             {loading ? "..." : "Correlations"}
                           </button>
+                            {/* Export Report button – visible when there's something to export */}
+                            {(analysisResult || correlationData) && (
+                              <button
+                                onClick={exportReport}
+                                className="px-4 py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all"
+                              >
+                                Export Report
+                              </button>
+                            )}
                         </div>
                       </div>
 

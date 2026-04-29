@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Analytics from './pages/Analytics';
 import { Toaster } from "sonner";
+import DataSources from './pages/DataSources';
 
 function App() {
   return (
@@ -18,6 +19,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Analytics />
+            </ProtectedRoute>
+          }
+          />
+        <Route
+          path="/data-sources"
+          element={
+            <ProtectedRoute>
+              <DataSources />
             </ProtectedRoute>
           }
           />

@@ -6,6 +6,7 @@ from typing import Optional, Dict, Any
 class DataFileBase(BaseModel):
     filename: str
     filepath: str
+    original_filepath: Optional[str] = None
     file_typ: Optional[str] # e.g., 'csv', 'xlsx'
     summary_stats: Optional[Dict[str, Any]] = None
     

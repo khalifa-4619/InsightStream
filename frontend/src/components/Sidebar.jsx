@@ -32,9 +32,9 @@ const Sidebar = () => {
                     <Activity size={18} /> Live Streams
                 </Link>
                 
-                <a href="#" className="flex items-center gap-3 p-3 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition-all">
+                <Link to="/data-sources" className={getLinkStyle('/data-sources')}>
                     <Database size={18} /> Data Sources
-                </a>
+                </Link>
 
                 <Link to="/analytics" className={getLinkStyle('/analytics')}>
                     <BarChart3 size={18} /> Analytics Models
