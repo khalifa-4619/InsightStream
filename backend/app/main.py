@@ -1,14 +1,15 @@
-from fastapi import FastAPI, Depends, HTTPException,UploadFile, File, status
+from fastapi import FastAPI, Depends, HTTPException,UploadFile, File, status, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.dataset import Dataset
 from app.models.user import User
+from app.models.activity_log import ActivityLog
 from app.schemas.user_schema import UserCreate, UserOut
 from app.crud import crud_user as user_crud, crud_dataset
 from app.core.config import settings
-from app.core.security import verify_password, create_access_token
+from app.core.security import verify_password, create_access_token, decode_token
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.token_schema import Token
 from app.schemas.data_schema import DataFileOut, DataFileCreate
@@ -16,12 +17,31 @@ from app.services.analytics import analyze_file
 from datetime import timedelta
 from typing import List
 from app.api.endpoints import analytics
+from app.services.logger import log_event, active_connections
 import shutil
 import os
 import pandas as pd
 import io
+import time
 
 app = FastAPI(title=settings.PROJECT_NAME, version="0.1.0")
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+
+    # Only log API calls
+    if request.url.path.startswith("/api") or request.url.path.startswith("/datasets"):
+        method = request.method
+        status = response.status_code
+        level = "ERROR" if status >= 400 else "INFO"
+
+        # Simple console log – no DB dependency
+        print(f"[{level}] {method} {request.url.path} -> {status} ({duration:.2f}s)")
+
+    return response 
+
 
 origins = [
     "http://localhost:5173",
@@ -130,7 +150,13 @@ async def upload_dataset(
         file_typ=file_ext.replace('.', ''), # 'csv', 'xlsx', etc.
         summary_stats=analysis_results
     )
-    
+    log_event(
+        db=db,
+        message=f"Dataset '{file.filename}' uploaded ({file_ext})",
+        level="INFO",
+        source="DATASET",
+        owner_id=current_user.id
+    )
     return crud_dataset.create_dataset(
         db,
         dataset_in,
@@ -165,6 +191,15 @@ def remove_dataset(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Dataset not found or unauthorized access."
         )
+        
+    log_event(
+        db=db,
+        message=f"Dataset {dataset_id} deleted",
+        level="WARNING",
+        source="DATASET",
+        owner_id=current_user.id,
+    )
+    
     return {"message": f"Dataset {dataset_id} and associated files have been purged."}
 
 @app.get("/datasets/{dataset_id}/download")
@@ -207,6 +242,65 @@ def download_cleaned_file(
         filename=f"cleaned_{dataset.filename}",
         media_type='application/octet-stream'
     )
+     
+@app.websocket("/ws/logs")
+async def websocket_logs(websocket: WebSocket, token: str = None):
+    if not token:
+        await websocket.close(code=1008)
+        return
+    
+    payload = decode_token(token)
+    if not payload:
+        await websocket.close(code=1008)
+        return
+    
+    # Obtain a DB session manually (cannot use Depends inside websocket)
+    db = next(get_db())
+    user = user_crud.get_user_by_email(db, email=payload.get("sub"))
+    if not user:
+        await websocket.close(code=1008)
+        return
+    
+    await websocket.accept()
+    # store the connection with its user_id for filtering
+    active_connections.append((websocket, user.id))
+    
+    try:
+        while True:
+            # Keep connection alive (we don't expect messages from client)
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        active_connections.remove((websocket, user.id))
+    
+@app.get("/logs/")
+def get_logs(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_crud.get_current_user),
+):
+    logs = (
+        db.query(ActivityLog)
+        .filter(
+            (ActivityLog.owner_id == current_user.id)
+            | (ActivityLog.owner_id == None)
+        )
+        .order_by(ActivityLog.timestamp.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return [
+        {
+            "id": log.id,
+            "timestamp": log.timestamp.isoformat(),
+            "level": log.level,
+            "source": log.source,
+            "message": log.message,
+            "owner_id": log.owner_id,
+        }
+        for log in logs
+    ]
     
 # Mounting the analytics router
 app.include_router(analytics.router, prefix="/api")

@@ -4,6 +4,8 @@ from app.db.session import get_db
 from app.models.dataset import Dataset
 from app.services.processor import InsightEngine
 from typing import Optional, Dict
+from app.services.logger import log_event
+from app.crud.crud_user import get_current_user 
 import os
 
 router = APIRouter()
@@ -13,7 +15,8 @@ async def process_dataset(
     dataset_id: int,
     task: str,
     payload: Optional[Dict] = Body(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     # 1. Fetch dataset from DB
     dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
@@ -29,12 +32,30 @@ async def process_dataset(
         if task == "clean":
             result = engine.clean_data(fill_strategy="median")
             _save_clean_data_and_update_metadata(engine, dataset, db)
+            
+            log_event(
+                db=db,
+                message=f"Global cleanse applied on dataset {dataset_id}",
+                level="INFO",
+                source="ENGINE",
+                owner_id=current_user.id,
+            )
+    
             return result
 
         # ---------------------------------------------------------------
         # TASK: univariate
         # ---------------------------------------------------------------
         elif task == "univariate":
+            
+            log_event(
+                    db=db,
+                    message=f"Univariate analysis applied on dataset {dataset_id}",
+                    level="INFO",
+                    source="ENGINE",
+                    owner_id=current_user.id,
+                )
+            
             return {
                 "univariate": engine.get_univariate(),
                 "global_insights": engine.get_global_insights()
@@ -44,6 +65,14 @@ async def process_dataset(
         # TASK: bivariate
         # ---------------------------------------------------------------
         elif task == "bivariate":
+            
+            log_event(
+                db=db,
+                message=f"Bivariate analysis applied on dataset {dataset_id}",
+                level="INFO",
+                source="ENGINE",
+                owner_id=current_user.id,
+            )
             return engine.get_bivariate()
 
         # ---------------------------------------------------------------
@@ -58,6 +87,14 @@ async def process_dataset(
 
             updated_univariate = engine.get_univariate()
             updated_insights = engine.get_global_insights()
+            
+            log_event(
+                db=db,
+                message=f"Recommendations applied on dataset {dataset_id}",
+                level="INFO",
+                source="ENGINE",
+                owner_id=current_user.id,
+            )
 
             return {
                 "status": "recommendations_applied",

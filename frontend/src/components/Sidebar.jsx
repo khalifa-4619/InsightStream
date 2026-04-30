@@ -40,9 +40,9 @@ const Sidebar = () => {
                     <BarChart3 size={18} /> Analytics Models
                 </Link>
                 
-                <a href="#" className="flex items-center gap-3 p-3 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition-all">
+                <Link to="/logs" className={getLinkStyle('/logs')}>
                     <Terminal size={18} /> Logs Terminal
-                </a>
+                </Link>
             </nav>
 
             <div className="p-4 border-t border-slate-800">

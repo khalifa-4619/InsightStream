@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Analytics from './pages/Analytics';
 import { Toaster } from "sonner";
 import DataSources from './pages/DataSources';
+import LogsTerminal from './pages/LogsTerminal';
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DataSources />
+            </ProtectedRoute>
+          }
+          />
+        <Route
+          path="/logs"
+          element={
+            <ProtectedRoute>
+              <LogsTerminal />
             </ProtectedRoute>
           }
           />
