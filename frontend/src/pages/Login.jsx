@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight } from 'lucide-react'; // Icons for a pro look
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -91,6 +91,12 @@ const Login = () => {
               Enter Workspace <ArrowRight className="h-5 w-5" />
             </button>
           </form>
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-indigo-600 hover:text-indigo-500 font-medium">
+              Create one
+            </Link>
+          </p>
         </div>
       </div>
     </div>

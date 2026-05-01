@@ -70,6 +70,21 @@ def read_root():
 def health_check():
     return {"status": "healthy", "version": "0.1.0"}
 
+@app.get("/users/{user_id}", response_model=UserOut)
+def read_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_crud.get_current_user),
+):
+    # Users can only view their own profile
+    if current_user.id != user_id:
+        raise HTTPException(status_code404, detail="User not found")
+    db_user = user_crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+    
+
 @app.post("/signup", response_model=UserOut)
 def signup(user_in: UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists

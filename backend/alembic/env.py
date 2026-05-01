@@ -1,5 +1,8 @@
 from app.core.config import settings
 from app.db.base import Base
+import app.models.user
+import app.models.dataset
+import app.models.activity_log
 
 from logging.config import fileConfig
 

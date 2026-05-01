@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     
 # What we need to create a user (Received during signup)
 class UserCreate(UserBase):
+    name: str
     email: EmailStr
     password: str
     

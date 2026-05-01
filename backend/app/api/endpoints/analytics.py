@@ -4,8 +4,9 @@ from app.db.session import get_db
 from app.models.dataset import Dataset
 from app.services.processor import InsightEngine
 from typing import Optional, Dict
+from app.models.user import User
 from app.services.logger import log_event
-from app.crud.crud_user import get_current_user 
+from app.crud import crud_user as user_crud, crud_dataset
 import os
 
 router = APIRouter()
@@ -16,10 +17,10 @@ async def process_dataset(
     task: str,
     payload: Optional[Dict] = Body(None),
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(user_crud.get_current_user)
 ):
     # 1. Fetch dataset from DB
-    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    dataset = crud_dataset.get_dataset(db, dataset_id, current_user.id)
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found in InsightStream")
 

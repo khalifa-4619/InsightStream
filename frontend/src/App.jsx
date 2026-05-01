@@ -7,6 +7,7 @@ import Analytics from './pages/Analytics';
 import { Toaster } from "sonner";
 import DataSources from './pages/DataSources';
 import LogsTerminal from './pages/LogsTerminal';
+import Signup from './pages/Signup';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route
           path='/analytics'
           element={

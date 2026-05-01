@@ -18,6 +18,7 @@ def get_user_by_email(db: Session, email: str):
 def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
     db_user = User(
+        name=user.name,
         email=user.email,
         hashed_password=hashed_password,
         is_premium=False # Everyone starts on the free tier
