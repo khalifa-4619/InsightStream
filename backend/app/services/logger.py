@@ -3,6 +3,7 @@ import asyncio
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.activity_log import ActivityLog
+from datetime import datetime, timezone
 
 # In-memory list of active WebSocket connections (we'll manage them later)
 active_connections = []
@@ -10,7 +11,7 @@ active_connections = []
 def log_event(db: Session, message: str, level: str = "INFO", source: str = "SYSTEM", owner_id: int = None):
     """Save log to DB and push to WebSocket clients."""
     log_entry = ActivityLog(
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         level=level,
         source=source,
         message=message,

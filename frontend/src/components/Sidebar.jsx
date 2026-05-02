@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Activity, Database, BarChart3, Terminal, LogOut } from 'lucide-react';
+import { Activity, Database, BarChart3, Terminal, LogOut, User } from 'lucide-react';
 
 const Sidebar = () => {
     const navigate = useNavigate();
@@ -46,6 +46,9 @@ const Sidebar = () => {
             </nav>
 
             <div className="p-4 border-t border-slate-800">
+                <Link to="/profile" className={getLinkStyle('/profile')}>
+                <User size={18} /> Profile
+                </Link>
                 <button onClick={handleLogout} className="flex items-center gap-3 p-3 text-slate-500 hover:text-red-400 w-full transition-colors">
                     <LogOut size={18} /> Exit System
                 </button>

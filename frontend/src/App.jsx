@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import DataSources from './pages/DataSources';
 import LogsTerminal from './pages/LogsTerminal';
 import Signup from './pages/Signup';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route
           path='/analytics'
           element={
