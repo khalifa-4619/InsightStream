@@ -59,6 +59,7 @@ async def process_dataset(
             
             return {
                 "univariate": engine.get_univariate(),
+                "categorical": engine.get_categorical(),
                 "global_insights": engine.get_global_insights()
             }
 

@@ -561,3 +561,37 @@ class InsightEngine:
             "remaining_issues": remaining_issues,
             "remaining_recommendations": remaining_recs
         }
+        
+    def get_categorical(self):
+        """
+        Return frequency and percentage breakdowns for all
+        object / category columns, excluding ID-like columns.
+        """
+        target_df = self._get_working_df()
+        if target_df.empty:
+            return {}
+
+        cat_df = target_df.select_dtypes(include=['object', 'category'])
+        result = {}
+
+        for col in cat_df.columns:
+            if col.lower() == 'id':
+                continue
+
+            counts = cat_df[col].value_counts(dropna=False)
+            total = len(cat_df[col])
+            breakdown = []
+            for value, count in counts.items():
+                percentage = round((count / total) * 100, 2) if total > 0 else 0
+                breakdown.append({
+                    "value": str(value) if not pd.isna(value) else "Missing",
+                    "count": int(count),
+                    "percentage": percentage,
+                })
+
+            result[col] = {
+                "unique_values": len(counts),
+                "breakdown": breakdown,
+            }
+
+        return result

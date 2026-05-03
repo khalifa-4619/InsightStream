@@ -9,6 +9,7 @@ import DataSources from './pages/DataSources';
 import LogsTerminal from './pages/LogsTerminal';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import Landing from './pages/Landing';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
     <Toaster richColors position="top-right" />
     <Router>
       <Routes>
+        <Route path="/" element={<Landing />} />   
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
