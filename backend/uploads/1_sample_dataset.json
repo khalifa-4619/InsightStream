@@ -1,0 +1,6 @@
+user_id,name,age,email,country,signup_date,last_login,subscription,usage_hours
+1,Alice Johnson,28,alice@example.com,USA,2024-01-15,2024-04-01,premium,120.5
+2,Michael Ade,32,michael@example.com,Nigeria,2024-02-10,2024-04-03,free,45.2
+3,Sophia Lee,24,sophia@example.com,UK,2024-03-05,2024-04-04,premium,89.7
+4,David Kim,29,david@example.com,Canada,2024-01-25,2024-03-30,free,60.1
+5,Fatima Bello,27,fatima@example.com,Nigeria,2024-02-20,2024-04-02,premium,150.3

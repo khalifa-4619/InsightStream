@@ -1,3 +1,17 @@
+"""
+Real‑time audit logging with WebSocket broadcasting.
+
+Architecture:
+    1. Endpoints call the synchronous `log_event()` to store a log in the database.
+    2. `log_event()` then schedules an asynchronous broadcast task
+       via `asyncio.get_running_loop().create_task()`.
+    3. The broadcast task (`_broadcast`) pushes the log to all
+       relevant WebSocket connections without delaying the HTTP response.
+
+This pattern keeps endpoints synchronous (simple, compatible with sync DB drivers)
+while adding real‑time functionality through background async tasks.
+"""
+
 import json
 import asyncio
 from datetime import datetime

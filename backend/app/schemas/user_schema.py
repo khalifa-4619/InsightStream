@@ -3,7 +3,6 @@ from typing import Optional
 
 # Common propeerties shared by all User schemas
 class UserBase(BaseModel):
-    email: Optional[EmailStr] = None
     is_active: Optional[bool] = True
     is_premium: Optional[bool] = False
     name: str

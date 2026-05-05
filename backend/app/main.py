@@ -14,7 +14,7 @@ from app.core.security import verify_password, create_access_token, decode_token
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.token_schema import Token
 from app.schemas.data_schema import DataFileOut, DataFileCreate
-from app.services.analytics import analyze_file
+from app.services.file_analyzer import analyze_file
 from datetime import timedelta, datetime, timezone
 from typing import List
 from app.api.endpoints import analytics

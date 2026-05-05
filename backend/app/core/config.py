@@ -1,7 +1,6 @@
 import os
 import urllib
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Optional
 
 # Get the absolute path of the directory where config.py is
 # This moves up two levels to find the 'backend' root where .env lives
