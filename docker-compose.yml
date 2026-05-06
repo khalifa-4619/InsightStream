@@ -1,0 +1,111 @@
+# =============================================================================
+# Docker Compose 3.8+
+# InsightStream – Production-Ready Local Deployment
+# =============================================================================
+# This file defines three services: db, backend, frontend.
+# They share a custom network so they can communicate by service name.
+# Volumes ensure that database data and uploaded files survive container restarts.
+
+version: "3.8"
+
+services:
+
+  # --------------------------------------------------------------------------
+  # 1. PostgreSQL Database
+  # --------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: insightstream_db
+    restart: unless-stopped
+
+    # Environment variables for the official Postgres image
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    # Persist database data in a named volume (survives container recreation)
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    # Health check – confirms Postgres is accepting connections
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    # Only expose to the internal Docker network, not to the host
+    # (backend talks to it internally; no external access needed)
+    ports:
+      - "5432:5432"   # optional: exposes to host for pgAdmin / debugging
+
+    networks:
+      - insightstream_net
+
+  # --------------------------------------------------------------------------
+  # 2. FastAPI Backend
+  # --------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: insightstream_backend
+    restart: unless-stopped
+
+    # All dynamic configuration comes from environment variables
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_SERVER: db                         # <-- matches the service name above
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    # Persist uploaded files (profile pictures, datasets)
+    volumes:
+      - backend_uploads:/app/uploads
+
+    # Must wait for the database to be healthy (via depends_on condition)
+    depends_on:
+      db:
+        condition: service_healthy
+
+    ports:
+      - "8000:8000"   # expose FastAPI on host for direct access / testing
+
+    networks:
+      - insightstream_net
+
+  # --------------------------------------------------------------------------
+  # 3. Frontend (React served by Nginx)
+  # --------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: insightstream_frontend
+    restart: unless-stopped
+
+    # No environment variables needed – API URL is handled by Nginx proxy
+
+    depends_on:
+      - backend
+
+    ports:
+      - "80:80"       # serve the app on port 80 (standard HTTP)
+
+    networks:
+      - insightstream_net
+
+# ============================================================================
+# Volumes & Networks
+# ============================================================================
+volumes:
+  pgdata:                 # database persistence
+  backend_uploads:        # uploaded files (datasets, profile pictures)
+
+networks:
+  insightstream_net:      # custom bridge network – all services can resolve each other by name
