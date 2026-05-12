@@ -13,15 +13,19 @@ import EmptyState from '../components/EmptyState';
 
 const Dashboard = () => {
   const [datasets, setDatasets] = useState([]);
-  const [selectedDataset, setSelectedDataset] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedDataset, setSelectedDataset] = useState(null);    // the dataset card clicked
+  const [drawerDataset, setDrawerDataset] = useState(null);        // fetched fresh when drawer opens
   const navigate = useNavigate();
 
+  // ---------------------------------------------------------------
+  // Fetch all datasets (used for cards and after upload)
+  // ---------------------------------------------------------------
   const fetchDatasets = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://127.0.0.1:8000/datasets/', {
+      const response = await axios.get('/datasets/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setDatasets(response.data);
@@ -34,6 +38,37 @@ const Dashboard = () => {
 
   useEffect(() => { fetchDatasets(); }, []);
 
+  // ---------------------------------------------------------------
+  // When a dataset is selected → fetch its LATEST details from API
+  // ---------------------------------------------------------------
+  useEffect(() => {
+    // If no dataset selected (drawer closed), clear the fresh data
+    if (!selectedDataset) {
+      setDrawerDataset(null);
+      return;
+    }
+
+    const fetchFullDataset = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(
+          `/datasets/${selectedDataset.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setDrawerDataset(res.data);
+      } catch (err) {
+        console.error('Failed to refresh dataset', err);
+        // Fall back to the original selected dataset if fetch fails
+        setDrawerDataset(selectedDataset);
+      }
+    };
+
+    fetchFullDataset();
+  }, [selectedDataset]);
+
+  // ---------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------
   return (
     <ErrorBoundary>
       <div className="flex min-h-screen bg-slate-900 text-slate-100 relative"> 
@@ -101,7 +136,7 @@ const Dashboard = () => {
           </section>
         </main>
 
-        {/* --- ANALYSIS DETAIL DRAWER (unchanged) --- */}
+        {/* --- ANALYSIS DETAIL DRAWER --- */}
         {selectedDataset && (
           <div className="fixed inset-0 z-50 flex justify-end">
             <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setSelectedDataset(null)} />
@@ -116,66 +151,76 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 text-center">
-                    <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">Rows</p>
-                    <p className="text-xl font-mono">{selectedDataset.summary_stats?.row_count ?? 0}</p>
-                </div>
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 text-center">
-                    <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">Columns</p>
-                    <p className="text-xl font-mono">{selectedDataset.summary_stats?.column_count ?? 0}</p>
-                </div>
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 text-center">
-                    <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">Weight</p>
-                    <p className="text-xl font-mono">{selectedDataset.summary_stats?.file_size_kb ?? 0} KB</p>
-                </div>
-              </div>
+              {/* Use the freshly fetched dataset if available, otherwise fall back */}
+              {(() => {
+                const ds = drawerDataset || selectedDataset;           // fresh data, or original as fallback
+                const stats = ds.summary_stats || {};
 
-              {/* Schema Mapping */}
-              <div className="mb-8">
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <Terminal size={14} /> Schema Mapping
-                </h3>
-                <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
-                  <table className="w-full text-left text-[11px]">
-                    <thead className="bg-slate-900/50 text-slate-500 border-b border-slate-800">
-                      <tr>
-                        <th className="px-4 py-3">Key Name</th>
-                        <th className="px-4 py-3">Type</th>
-                        <th className="px-4 py-3 text-right">Missing</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/50 font-mono">
-                      {Object.entries(selectedDataset.summary_stats?.data_types || {}).map(([col, type]) => (
-                        <tr key={col} className="hover:bg-slate-800/20">
-                          <td className="px-4 py-3 text-slate-300">{col}</td>
-                          <td className="px-4 py-3 text-indigo-400 italic">{type}</td>
-                          <td className="px-4 py-3 text-right text-orange-400">
-                            {selectedDataset.summary_stats?.missing_values?.[col] ?? '—'}
-                          </td>
-                        </tr>
-                      ))}
-                      {Object.keys(selectedDataset.summary_stats?.data_types || {}).length === 0 && (
-                        <tr>
-                          <td colSpan={3} className="px-4 py-3 text-center text-slate-500">No schema data available</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                return (
+                  <>
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                      <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 text-center">
+                        <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">Rows</p>
+                        <p className="text-xl font-mono">{stats.row_count ?? '—'}</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 text-center">
+                        <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">Columns</p>
+                        <p className="text-xl font-mono">{stats.column_count ?? '—'}</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 text-center">
+                        <p className="text-slate-500 text-[10px] uppercase font-bold mb-1">Weight</p>
+                        <p className="text-xl font-mono">{stats.file_size_kb ?? '—'} KB</p>
+                      </div>
+                    </div>
 
-              {/* JSON Stream View */}
-              <div>
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <FileText size={14} /> Data Stream Preview
-                </h3>
-                <div className="bg-slate-950 rounded-xl border border-slate-800 p-4">
-                  <pre className="text-[10px] text-slate-400 leading-relaxed font-mono whitespace-pre-wrap">
-                    {JSON.stringify(selectedDataset.summary_stats?.preview || [], null, 2)}
-                  </pre>
-                </div>
-              </div>
+                    {/* Schema Mapping */}
+                    <div className="mb-8">
+                      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <Terminal size={14} /> Schema Mapping
+                      </h3>
+                      <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                        <table className="w-full text-left text-[11px]">
+                          <thead className="bg-slate-900/50 text-slate-500 border-b border-slate-800">
+                            <tr>
+                              <th className="px-4 py-3">Key Name</th>
+                              <th className="px-4 py-3">Type</th>
+                              <th className="px-4 py-3 text-right">Missing</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/50 font-mono">
+                            {Object.entries(stats.data_types || {}).map(([col, type]) => (
+                              <tr key={col} className="hover:bg-slate-800/20">
+                                <td className="px-4 py-3 text-slate-300">{col}</td>
+                                <td className="px-4 py-3 text-indigo-400 italic">{type}</td>
+                                <td className="px-4 py-3 text-right text-orange-400">
+                                  {stats.missing_values?.[col] ?? '—'}
+                                </td>
+                              </tr>
+                            ))}
+                            {Object.keys(stats.data_types || {}).length === 0 && (
+                              <tr>
+                                <td colSpan={3} className="px-4 py-3 text-center text-slate-500">No schema data available</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* JSON Stream View */}
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <FileText size={14} /> Data Stream Preview
+                      </h3>
+                      <div className="bg-slate-950 rounded-xl border border-slate-800 p-4">
+                        <pre className="text-[10px] text-slate-400 leading-relaxed font-mono whitespace-pre-wrap">
+                          {JSON.stringify(stats.preview || [], null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         )}

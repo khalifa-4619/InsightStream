@@ -8,7 +8,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import { SkeletonBox } from '../components/Skeleton';
 import EmptyState from '../components/EmptyState';
 
-const WS_URL = 'ws://127.0.0.1:8000/ws/logs';
+const WS_URL = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}`;
 
 const LogsTerminal = () => {
   const [logs, setLogs] = useState([]);
@@ -22,7 +22,7 @@ const LogsTerminal = () => {
     const fetchLogs = async () => {
       setLoading(true);
       try {
-        const res = await axios.get('http://127.0.0.1:8000/logs/', {
+        const res = await axios.get('/logs/', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setLogs(res.data.reverse()); // newest at bottom

@@ -6,7 +6,6 @@
 # They share a custom network so they can communicate by service name.
 # Volumes ensure that database data and uploaded files survive container restarts.
 
-version: "3.8"
 
 services:
 
@@ -31,9 +30,10 @@ services:
     # Health check – confirms Postgres is accepting connections
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
     # Only expose to the internal Docker network, not to the host
     # (backend talks to it internally; no external access needed)

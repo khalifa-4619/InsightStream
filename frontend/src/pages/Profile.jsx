@@ -16,7 +16,7 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/users/me', { headers });
+      const res = await axios.get('/users/me', { headers });
       setUser(res.data);
       setName(res.data.name);
     } catch (err) {
@@ -28,7 +28,7 @@ const Profile = () => {
 
   const handleSaveName = async () => {
     try {
-      const res = await axios.put('http://127.0.0.1:8000/users/me', { name }, { headers });
+      const res = await axios.put('/users/me', { name }, { headers });
       setUser(res.data);
       setEditing(false);
       toast.success('Name updated');
@@ -45,7 +45,7 @@ const Profile = () => {
     formData.append('file', file);
 
     try {
-      const res = await axios.post('http://127.0.0.1:8000/users/me/picture', formData, {
+      const res = await axios.post('/users/me/picture', formData, {
         headers: { ...headers, 'Content-Type': 'multipart/form-data' },
       });
       setUser(res.data);
@@ -57,7 +57,7 @@ const Profile = () => {
 
   const getPictureUrl = (path) => {
     if (!path) return null;
-    return `http://127.0.0.1:8000/uploads/${path}`;
+    return `/uploads/${path}`;
   };
 
   if (!user) return <div className="flex min-h-screen bg-slate-900"><Sidebar /><main className="flex-1 p-8"><CardSkeleton /></main></div>;

@@ -56,7 +56,7 @@ const Analytics = () => {
     const fetchDatasets = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://127.0.0.1:8000/datasets/', {
+        const response = await axios.get('/datasets/', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setDatasets(response.data);
@@ -97,7 +97,7 @@ const Analytics = () => {
 
       // POST request to FastAPI endpoint
       const response = await axios.post(
-        `http://127.0.0.1:8000/api/process/${selectedDs.id}?task=${taskType}`,
+        `/api/process/${selectedDs.id}?task=${taskType}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -14,7 +14,7 @@ env/
 
 # Database
 *.sqlite3
-
+frontend-build.log
 *.http
 
 # Distributions / Packaging

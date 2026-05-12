@@ -19,7 +19,7 @@ const DataSources = () => {
   const fetchDatasets = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://127.0.0.1:8000/datasets/', { headers });
+      const response = await axios.get('/datasets/', { headers });
       setDatasets(response.data);
     } catch (err) {
       toast.error('Failed to load datasets');
@@ -32,7 +32,7 @@ const DataSources = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/datasets/${id}`, { headers });
+      await axios.delete(`/datasets/${id}`, { headers });
       toast.success('Dataset deleted');
       fetchDatasets();
     } catch (err) {
@@ -44,7 +44,7 @@ const DataSources = () => {
   const downloadOriginal = async (item) => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/datasets/${item.id}/download`,
+        `/datasets/${item.id}/download`,
         { headers, responseType: 'blob' }
       );
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -63,7 +63,7 @@ const DataSources = () => {
   const downloadCleaned = async (item) => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/datasets/${item.id}/download/cleaned`,
+        `/datasets/${item.id}/download/cleaned`,
         { headers, responseType: 'blob' }
       );
       const url = window.URL.createObjectURL(new Blob([response.data]));

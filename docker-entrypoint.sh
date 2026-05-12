@@ -21,26 +21,22 @@ echo " InsightStream Backend - Starting Entrypoint"
 echo "============================================="
 
 
-# =============================================================
-# 1. WAIT FOR POSTGRESQL
-# =============================================================
-echo " Waiting for PostgreSQL to be ready..."
-
-# pg_isready, the standard PostgreSQL utility that checks connectivity.
-# The loop retries every 2 seconds untill success or too many failures.
+# --------------------------------------------------------------------------
+# 1. WAIT FOR POSTGRESQL (TCP only)
+# --------------------------------------------------------------------------
+echo "⏳ Waiting for PostgreSQL to be ready..."
 
 RETRIES=30
-until pg_isready -h "$POSTGRES_SERVER" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "$POSTGRES_DB" > /dev/null 2>&1; do
-	RETRIES=$((RETRIES-1))
-	if [ $RETRIES -le 0 ]; then
-		echo "PostgreSQL did not become ready in time. Exiting."
-		exit 1
-	fi
-	echo "  Waiting... ($RETRIES retries left)"
-	sleep 2
+until nc -z "$POSTGRES_SERVER" "$POSTGRES_PORT"; do
+    RETRIES=$((RETRIES-1))
+    if [ $RETRIES -le 0 ]; then
+        echo "❌ PostgreSQL did not become ready in time. Exiting."
+        exit 1
+    fi
+    echo "   Waiting... ($RETRIES retries left)"
+    sleep 2
 done
-echo "PostgreSQL is ready!"
-
+echo "✅ PostgreSQL is ready!"
 # ==============================================================
 # 2. RUN ALEMBIC MIGRATIONS
 # ==============================================================

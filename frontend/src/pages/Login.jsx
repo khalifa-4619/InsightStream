@@ -17,7 +17,7 @@ const Login = () => {
     formData.append('username', email); //Must be 'username' for OAuth2
     formData.append('password', password);
     try {
-      const response = await axios.post('http://127.0.0.1:8000/login', formData, {
+      const response = await axios.post('/login', formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }

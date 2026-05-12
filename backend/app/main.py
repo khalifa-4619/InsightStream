@@ -52,6 +52,8 @@ origins = [
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1",
+    "http://localhost",
+    "http://localhost:80",
 ]
 
 app.add_middleware(
@@ -283,6 +285,18 @@ def download_cleaned_file(
         filename=f"cleaned_{dataset.filename}",
         media_type='application/octet-stream'
     )
+
+@app.get("/datasets/{dataset_id}", response_model=DataFileOut)
+def get_dataset_details(
+    dataset_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_crud.get_current_user)
+):
+    """Return the full details (including summary_stats) for one dataset."""
+    dataset = crud_dataset.get_dataset(db, dataset_id, current_user.id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return dataset
 
 
 # -------------------------------------------------------------------
